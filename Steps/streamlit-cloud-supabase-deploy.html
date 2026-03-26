@@ -1164,32 +1164,28 @@ git push origin main</code></pre>
             </div>
 
             <div class="step-box">
-                <h3><span class="step-number">3</span>Configurar Python 3.11 — Paso crítico de rendimiento</h3>
-                <p>Antes de hacer clic en Deploy, configura la versión de Python. Streamlit Cloud por defecto usa Python 3.9 — Python 3.11 es significativamente más rápido (hasta 60% en benchmarks de CPython).</p>
+                <h3><span class="step-number">3</span>Configurar Python 3.11 — Directamente en Streamlit Cloud</h3>
+                <p>Streamlit Cloud usa Python 3.9 por defecto, pero nuestro proyecto necesita <strong>Python 3.11</strong> porque es significativamente más rápido (hasta 60% en benchmarks de CPython) y compatible con todas nuestras dependencias. Este cambio se realiza directamente en la interfaz de Streamlit Cloud al momento del despliegue:</p>
 
-                <p style="margin-top: 15px;"><strong>Opción A — Desde la UI (recomendado):</strong></p>
                 <ol>
-                    <li>En la pantalla de "Deploy", clic en <strong>Advanced settings</strong></li>
-                    <li>En el campo <strong>Python version</strong>, selecciona <code>3.11</code></li>
+                    <li>En la pantalla de <strong>"Deploy an app"</strong>, antes de hacer clic en Deploy, haz clic en <strong>"Advanced settings"</strong></li>
+                    <li>En el campo <strong>"Python version"</strong>, cambia el valor de <code>3.9</code> a <code>3.11</code></li>
+                    <li>Streamlit Cloud instalará Python 3.11 en el contenedor de la app automáticamente</li>
                 </ol>
 
-                <p style="margin-top: 15px;"><strong>Opción B — Archivo en el repositorio (permanente y reproducible):</strong></p>
-                <p>Crea el archivo <code>.python-version</code> en la raíz del proyecto:</p>
-                <pre><code>3.11</code></pre>
-                <p style="margin-top: 10px;">Agrega y commitea:</p>
-                <pre><code>echo "3.11" > .python-version
-git add .python-version
-git commit -m "config: fija Python 3.11 para Streamlit Cloud"
-git push origin main</code></pre>
-
                 <div class="info-box">
-                    <h4>📌 ¿Por qué Python 3.11?</h4>
+                    <h4>📌 ¿Por qué Python 3.11 y no 3.9 o 3.12?</h4>
                     <ul>
                         <li><strong>Rendimiento:</strong> CPython 3.11 es ~10-60% más rápido que 3.9/3.10 gracias al proyecto "Faster CPython"</li>
                         <li><strong>Pandas 2.x:</strong> pandas 2.3 requiere Python 3.9+ y aprovecha mejor Python 3.11</li>
                         <li><strong>SQLAlchemy 2.0:</strong> funciona óptimamente en 3.11</li>
-                        <li><strong>Consistencia:</strong> si tu entorno local usa 3.11, producción tiene el mismo comportamiento</li>
+                        <li><strong>Estabilidad:</strong> Python 3.12+ puede tener incompatibilidades con algunas dependencias; 3.11 es la opción más estable y probada para producción en Streamlit Cloud</li>
                     </ul>
+                </div>
+
+                <div class="reflection-box">
+                    <h4>⚠️ Nota importante</h4>
+                    <p>No es necesario crear un archivo <code>.python-version</code> en el repositorio — la configuración de Python 3.11 en <strong>Advanced settings</strong> de Streamlit Cloud es suficiente y queda guardada para todos los redespliegues futuros de la app.</p>
                 </div>
 
             </div>
