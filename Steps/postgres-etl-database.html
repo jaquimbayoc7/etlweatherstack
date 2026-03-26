@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETL con PostgreSQL | Minería de Datos | Ingeniería de Sistemas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #1e3c72;
+    --secondary-color: #2a5298;
+    --accent-color: #ff6b6b;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --border-color: #e0e0e0;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --code-bg: #2d2d2d;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-text);
+    background-color: #fff;
+}
+
+/* Header */
+.main-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 0;
+}
+
+.top-bar {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    text-align: center;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.main-nav {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--accent-color);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Main Content */
+.main-content {
+    padding: 50px 0;
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h2 {
+    color: var(--secondary-color);
+    font-size: 2em;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--accent-color);
+    padding-left: 15px;
+}
+
+h3 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+h4 {
+    color: var(--secondary-color);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 60px 40px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.hero-section h1 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.hero-section .lead {
+    font-size: 1.2em;
+    line-height: 1.8;
+}
+
+.lead {
+    font-size: 1.1em;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+
+/* Dividers */
+.divider {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 40px 0;
+}
+
+.divider-thick {
+    border: none;
+    border-top: 3px solid var(--accent-color);
+    margin: 50px 0;
+}
+
+/* Definition Box */
+.definition-box {
+    background-color: #e8f4f8;
+    border-left: 5px solid var(--secondary-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    font-size: 1.05em;
+}
+
+/* Reflection Box */
+.reflection-box {
+    background-color: #fff3cd;
+    border-left: 5px solid var(--warning-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.reflection-box h4 {
+    color: #856404;
+    margin-bottom: 10px;
+}
+
+.reflection-box p,
+.reflection-box ul {
+    color: #856404;
+    line-height: 1.7;
+}
+
+.reflection-box ul {
+    margin-left: 20px;
+}
+
+.reflection-box li {
+    margin-bottom: 8px;
+}
+
+/* Success Box */
+.success-box {
+    background-color: #d4edda;
+    border-left: 5px solid var(--success-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.success-box h4 {
+    color: #155724;
+    margin-bottom: 10px;
+}
+
+.success-box p {
+    color: #155724;
+    line-height: 1.7;
+}
+
+/* Cards */
+.card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin: 15px 0;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card h3,
+.card h4 {
+    color: var(--secondary-color);
+    margin-top: 0;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+/* Code Blocks */
+pre {
+    background-color: var(--code-bg);
+    color: #f8f8f2;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.95em;
+    line-height: 1.5;
+    border-left: 4px solid var(--accent-color);
+    position: relative;
+}
+
+code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--primary-color);
+}
+
+pre code {
+    background-color: transparent;
+    color: #f8f8f2;
+    padding: 0;
+}
+
+/* Step Box */
+.step-box {
+    background-color: var(--light-bg);
+    border-left: 5px solid var(--secondary-color);
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.step-number {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.step-box h3 {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+}
+
+.step-box h3 .step-number {
+    margin-top: 0;
+}
+
+/* Tables */
+.table-responsive {
+    overflow-x: auto;
+    margin: 30px 0;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.styled-table thead tr {
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: left;
+    font-weight: 500;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.styled-table tbody tr:hover {
+    background-color: var(--light-bg);
+}
+
+.styled-table tbody tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+/* Lists */
+ul, ol {
+    margin: 15px 0;
+    margin-left: 30px;
+}
+
+li {
+    margin: 8px 0;
+    line-height: 1.7;
+}
+
+/* Links */
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Flow Diagram */
+.flow-diagram {
+    background-color: var(--light-bg);
+    padding: 30px;
+    border-radius: 10px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.flow-diagram pre {
+    background-color: white;
+    color: var(--dark-text);
+    border: 2px solid var(--secondary-color);
+    text-align: left;
+    display: inline-block;
+}
+
+/* Badge */
+.badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin: 5px 5px 5px 0;
+}
+
+.badge-primary {
+    background-color: #e7f3ff;
+    color: #004085;
+}
+
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Feature List */
+.feature-list {
+    list-style: none;
+    margin: 20px 0;
+}
+
+.feature-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.feature-list li:before {
+    content: "✓ ";
+    color: var(--success-color);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Footer */
+.main-footer {
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 40px 0;
+    margin-top: 50px;
+}
+
+.main-footer p {
+    margin: 8px 0;
+    font-size: 0.95em;
+}
+
+.main-footer ul {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.main-footer li {
+    margin: 8px 0;
+}
+
+.main-footer a {
+    color: #fff9e6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.main-footer a:hover {
+    color: var(--accent-color);
+}
+
+/* Scroll to Top Button */
+#scrollTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 99;
+    transition: background-color 0.3s;
+}
+
+#scrollTopBtn:hover {
+    background-color: var(--accent-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h2 {
+        font-size: 1.5em;
+    }
+    
+    .hero-section {
+        padding: 40px 20px;
+    }
+    
+    .main-nav ul {
+        flex-direction: column;
+    }
+    
+    .main-nav a {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .styled-table {
+        font-size: 0.9em;
+    }
+    
+    .styled-table th,
+    .styled-table td {
+        padding: 10px;
+    }
+    
+    pre {
+        font-size: 0.85em;
+        padding: 15px;
+    }
+
+    .brand-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .brand-name {
+        font-size: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="top-bar">
+            <div class="brand-container">
+                <img src="https://raw.githubusercontent.com/code-corhuila/material-mineria-datos/b3725d694125ab35294ddfe415a327bc1445d32c/01-week/01-session/LOGO%20CORHUILA%20BLANCO%20PNG%20(2).png" alt="Logo Corhuila" class="logo-img">
+                <div>
+                    <div class="brand-name">CORHUILA - Corporación Universitaria de Huila</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Ingeniería de Sistemas | Minería de Datos</div>
+                </div>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#introduccion" class="nav-link">Introducción</a></li>
+                <li><a href="#postgres" class="nav-link">PostgreSQL Setup</a></li>
+                <li><a href="#conexion-python" class="nav-link">Conexión con Python</a></li>
+                <li><a href="#migraciones" class="nav-link">Migraciones DB</a></li>
+                <li><a href="#modelos" class="nav-link">Modelos Datos</a></li>
+                <li><a href="#integracion-etl" class="nav-link">Integración ETL</a></li>
+                <li><a href="#resumen" class="nav-link">Resumen</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container main-content">
+
+        <section id="introduccion" class="hero-section">
+            <h1>🗄️ ETL con PostgreSQL</h1>
+            <p class="lead">Integra una base de datos profesional al pipeline de extracción de datos de clima</p>
+            <p style="margin-top: 20px; font-size: 1em; opacity: 0.95;">
+                Aprenderás a reemplazar archivos locales (CSV, JSON) por una base de datos relacional robusta, escalable y lista para producción
+            </p>
+        </section>
+
+        <hr class="divider">
+
+        <section id="postgres">
+            <h2><i class="fas fa-database"></i> Fase 1: Instalación y Configuración de PostgreSQL</h2>
+
+            <p>PostgreSQL es un sistema de gestión de base de datos relacional de código abierto, potente y confiable. Es el estándar en industria para almacenar datos de aplicaciones.</p>
+
+            <div class="definition-box">
+                <h4>¿Qué es PostgreSQL?</h4>
+                <p>PostgreSQL es una base de datos relacional que permite almacenar, organizar y consultar datos de manera estructurada. Soporta transacciones ACID, es escalable y tiene extensiones poderosas.</p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Opción A: Instalar PostgreSQL en Windows</h3>
+                <p>Ve a <a href="https://www.postgresql.org/download/" target="_blank">postgresql.org/download</a></p>
+                <ul>
+                    <li>Descarga el instalador para Windows</li>
+                    <li>Ejecuta el instalador</li>
+                    <li>Durante la instalación:
+                        <ul>
+                            <li>Superuser: <code>postgres</code></li>
+                            <li>Contraseña: elige una contraseña fuerte</li>
+                            <li>Puerto: mantén <code>5432</code> (puerto default)</li>
+                            <li>Locale: selecciona tu idioma local</li>
+                        </ul>
+                    </li>
+                    <li>Completa la instalación y reinicia si es necesario</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Opción B: PostgreSQL en WSL Ubuntu</h3>
+                <p>Si estás en WSL, instala desde el terminal:</p>
+                <pre><code>sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+
+# Inicia el servicio
+sudo service postgresql start
+
+# Verifica que esté corriendo
+sudo service postgresql status</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Verifica la Instalación</h3>
+                <p>Conecta a la base de datos por defecto:</p>
+                <pre><code># En Windows (desde PowerShell):
+psql -U postgres
+
+# En WSL (por defecto es postgres):
+sudo -u postgres psql
+
+# Deberías ver:
+# psql (15.0)
+# Type "help" for help.
+# postgres=#</code></pre>
+            </div>
+
+            <div class="reflection-box">
+                <h4>⚠️ Seguridad: Cambiar Contraseña de Postgres</h4>
+                <p>Una vez conectado, cambia la contraseña del superusuario:</p>
+                <pre><code>ALTER USER postgres WITH PASSWORD 'nueva_contraseña_segura';
+\q  -- para salir</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Instala pgAdmin (GUI opcional)</h3>
+                <p>pgAdmin es una interfaz gráfica para administrar PostgreSQL. Descárgalo de <a href="https://www.pgadmin.org/" target="_blank">pgadmin.org</a></p>
+                <p style="margin-top: 15px;">Una vez instalado, puedes conectarte a tu servidor PostgreSQL desde la interfaz:</p>
+                <ul>
+                    <li>Host: localhost</li>
+                    <li>Puerto: 5432</li>
+                    <li>Usuario: postgres</li>
+                    <li>Contraseña: la que configuraste</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ PostgreSQL Instalado</h4>
+                <p>Tienes un servidor PostgreSQL corriendo en tu máquina. Ahora crearemos una base de datos para nuestro proyecto ETL.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="conexion-python">
+            <h2><i class="fas fa-python"></i> Fase 2: Conexión desde Python</h2>
+
+            <p>Usaremos la librería <code>psycopg2</code> (driver de PostgreSQL para Python) y <code>SQLAlchemy</code> (ORM profesional).</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Instala Dependencias</h3>
+                <p>En tu proyecto ETL anterior, actualiza <code>requirements.txt</code>:</p>
+                <pre><code>requests==2.31.0
+pandas==2.1.0
+python-dotenv==1.0.0
+matplotlib==3.8.0
+openpyxl==3.1.2
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23
+alembic==1.12.1</code></pre>
+                <p style="margin-top: 15px;">Luego instala:</p>
+                <pre><code>pip install -r requirements.txt</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Configura Variables de Entorno</h3>
+                <p>Actualiza tu archivo <code>.env</code>:</p>
+                <pre><code>API_KEY=tu_api_key_aqui
+WEATHERSTACK_BASE_URL=https://api.weatherstack.com
+CIUDADES=Bogota,Medellin,Cali,Barranquilla,Cartagena
+
+# Configuración PostgreSQL
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=tu_contraseña_segura
+DB_NAME=weatherstack_etl</code></pre>
+                <p style="margin-top: 15px;"><strong>⚠️ Importante:</strong> Mantén <code>.env</code> en <code>.gitignore</code></p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Crea la Base de Datos</h3>
+                <p>Desde el terminal, conéctate como superusuario y crea la BD:</p>
+                <pre><code># Conecta a PostgreSQL
+psql -U postgres
+
+# Dentro de psql:
+CREATE DATABASE weatherstack_etl;
+\connect weatherstack_etl
+\q</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Crea el Módulo de Conexión</h3>
+                <p>Crea <code>scripts/database.py</code>:</p>
+                <pre><code>#!/usr/bin/env python3
+import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker, declarative_base
+import logging
+
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+# Configuración de la conexión
+DB_HOST = os.getenv('DB_HOST')
+DB_PORT = os.getenv('DB_PORT')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
+
+# URL de conexión
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# Motor SQLAlchemy
+engine = create_engine(DATABASE_URL, echo=False)
+
+# Base para modelos ORM
+Base = declarative_base()
+
+# Session factory
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Metadata para inspeccionar la BD
+metadata = MetaData()
+metadata.reflect(bind=engine)
+
+def get_db():
+    """Obtiene una sesión de base de datos"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def test_connection():
+    """Prueba la conexión a la base de datos"""
+    try:
+        with engine.connect() as connection:
+            result = connection.execute("SELECT 1")
+            logger.info("✅ Conexión a PostgreSQL exitosa")
+            return True
+    except Exception as e:
+        logger.error(f"❌ Error conectando a PostgreSQL: {str(e)}")
+        return False
+
+def create_all_tables():
+    """Crea todas las tablas definidas en los modelos"""
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("✅ Tablas creadas exitosamente")
+    except Exception as e:
+        logger.error(f"❌ Error creando tablas: {str(e)}")</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">5</span>Prueba la Conexión</h3>
+                <p>Crea un script de prueba <code>scripts/test_db.py</code>:</p>
+                <pre><code>#!/usr/bin/env python3
+import sys
+sys.path.insert(0, '.')
+
+from scripts.database import test_connection, engine
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+if __name__ == "__main__":
+    print("\n" + "="*50)
+    print("PRUEBA DE CONEXIÓN A POSTGRESQL")
+    print("="*50)
+    
+    if test_connection():
+        print("✅ Conexión exitosa a la base de datos")
+        print(f"Base de datos: {engine.url.database}")
+        print(f"Host: {engine.url.host}")
+        print(f"Puerto: {engine.url.port}")
+    else:
+        print("❌ No se pudo conectar a la base de datos")
+        print("\nVerifica:")
+        print("- PostgreSQL está corriendo")
+        print("- Variables en .env son correctas")
+        print("- Base de datos existe")
+    
+    print("="*50 + "\n")</code></pre>
+                <p style="margin-top: 15px;">Ejecuta la prueba:</p>
+                <pre><code>python scripts/test_db.py</code></pre>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Conexión Python-PostgreSQL Establecida</h4>
+                <p>Ahora tu código Python puede comunicarse con la base de datos.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="migraciones">
+            <h2><i class="fas fa-code-branch"></i> Fase 3: Sistema de Migraciones con Alembic</h2>
+
+            <p>Alembic es una herramienta de versionamiento de esquemas que permite gestionar cambios en la BD de forma controlada y reproducible.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Inicializa Alembic</h3>
+                <p>En la raíz de tu proyecto:</p>
+                <pre><code>alembic init alembic</code></pre>
+                <p style="margin-top: 15px;">Esto crea una carpeta <code>alembic/</code> con la configuración.</p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Configura Alembic</h3>
+                <p>Edita <code>alembic/env.py</code> para conectar a tu proyecto:</p>
+                <pre><code>import os
+from dotenv import load_dotenv
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
+
+load_dotenv()
+
+# Importa la configuración de la BD
+import sys
+sys.path.insert(0, '.')
+from scripts.database import DATABASE_URL, Base
+
+config = context.config
+
+# Establece la URL de la BD
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
+# Importa modelos para auto-generate
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
+target_metadata = Base.metadata
+
+def run_migrations_offline() -> None:
+    """Ejecuta migraciones en modo offline"""
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+def run_migrations_online() -> None:
+    """Ejecuta migraciones en modo online"""
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()</code></pre>
+            </div>
+
+            <div class="reflection-box">
+                <h4>📝 ¿Qué son las Migraciones?</h4>
+                <p>Las migraciones son scripts que documentan cambios en tu esquema de base de datos. Permite que:</p>
+                <ul>
+                    <li>Otros desarrolladores apliquen los mismos cambios</li>
+                    <li>Revertir cambios si es necesario</li>
+                    <li>Versionamiento de la estructura de datos</li>
+                    <li>Reproducibilidad en diferentes ambientes</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="modelos">
+            <h2><i class="fas fa-cube"></i> Fase 4: Modelos de Datos</h2>
+
+            <p>Define la estructura de las tablas usando SQLAlchemy ORM. Esto es más Pythonic que SQL puro.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Crea Modelos</h3>
+                <p>Crea <code>scripts/models.py</code>:</p>
+                <pre><code>#!/usr/bin/env python3
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
+from sqlalchemy import ForeignKey, Index
+from sqlalchemy.orm import relationship
+from scripts.database import Base
+
+class Ciudad(Base):
+    """Modelo para ciudades"""
+    __tablename__ = "ciudades"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String(100), unique=True, nullable=False, index=True)
+    pais = Column(String(100), nullable=False)
+    latitud = Column(Float, nullable=False)
+    longitud = Column(Float, nullable=False)
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+    activa = Column(Boolean, default=True)
+
+    # Relación con registros de clima
+    registros_clima = relationship("RegistroClima", back_populates="ciudad", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Ciudad(nombre='{self.nombre}', pais='{self.pais}')>"
+
+class RegistroClima(Base):
+    """Modelo para datos de clima extraídos"""
+    __tablename__ = "registros_clima"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ciudad_id = Column(Integer, ForeignKey('ciudades.id'), nullable=False, index=True)
+    temperatura = Column(Float, nullable=False)
+    sensacion_termica = Column(Float, nullable=True)
+    humedad = Column(Float, nullable=False)
+    velocidad_viento = Column(Float, nullable=False)
+    descripcion = Column(String(255), nullable=False)
+    codigo_tiempo = Column(Integer, nullable=False)
+    fecha_extraccion = Column(DateTime, default=datetime.utcnow, index=True)
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+
+    # Relación con ciudad
+    ciudad = relationship("Ciudad", back_populates="registros_clima")
+
+    # Índices para búsquedas rápidas
+    __table_args__ = (
+        Index('idx_ciudad_fecha', 'ciudad_id', 'fecha_extraccion'),
+    )
+
+    def __repr__(self):
+        return f"<RegistroClima(ciudad_id={self.ciudad_id}, temp={self.temperatura}°C)>"
+
+class MetricasETL(Base):
+    """Modelo para registrar métricas de cada ejecución del ETL"""
+    __tablename__ = "metricas_etl"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    fecha_ejecucion = Column(DateTime, default=datetime.utcnow, index=True)
+    registros_extraidos = Column(Integer, nullable=False)
+    registros_guardados = Column(Integer, nullable=False)
+    registros_fallidos = Column(Integer, default=0)
+    tiempo_ejecucion_segundos = Column(Float, nullable=False)
+    estado = Column(String(50), nullable=False)  # SUCCESS, PARTIAL, FAILED
+    mensaje = Column(String(500), nullable=True)
+
+    def __repr__(self):
+        return f"<MetricasETL(fecha={self.fecha_ejecucion}, estado={self.estado})>"</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Crea Primera Migración</h3>
+                <p>Genera automáticamente la migración desde los modelos:</p>
+                <pre><code>alembic revision --autogenerate -m "Initial migration: Create tables for weather ETL"</code></pre>
+                <p style="margin-top: 15px;">Esto crea un archivo en <code>alembic/versions/</code> con los DDL SQL necesarios.</p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Aplica la Migración</h3>
+                <p>Ejecuta la migración para crear las tablas en PostgreSQL:</p>
+                <pre><code>alembic upgrade head</code></pre>
+                <p style="margin-top: 15px;">Verifica en pgAdmin o con SQL que las tablas existen:</p>
+                <pre><code>psql -U postgres -d weatherstack_etl
+\dt  -- lista tablas
+\d ciudades  -- describe tabla ciudades</code></pre>
+            </div>
+
+            <div class="definition-box">
+                <h4>🗂️ Ventajas de usar ORM</h4>
+                <p><strong>ORM (Object-Relational Mapping)</strong> como SQLAlchemy permite:</p>
+                <ul>
+                    <li>Escribir datos usando Python en lugar de SQL puro</li>
+                    <li>Relaciones automáticas entre tablas</li>
+                    <li>Validación de tipos</li>
+                    <li>Portabilidad entre bases de datos</li>
+                    <li>Código más legible y mantenible</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="integracion-etl">
+            <h2><i class="fas fa-arrows-alt"></i> Fase 5: Integración con el Pipeline ETL</h2>
+
+            <p>Modifica tu <code>extractor.py</code> original para guardar en PostgreSQL en lugar de archivos CSV/JSON.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Actualiza el Extractor</h3>
+                <p>Crea <code>scripts/extractor_db.py</code>:</p>
+                <pre><code>#!/usr/bin/env python3
+import os
+import requests
+import json
+import pandas as pd
+from datetime import datetime
+import time
+from dotenv import load_dotenv
+import logging
+from sqlalchemy.exc import IntegrityError
+
+from scripts.database import SessionLocal
+from scripts.models import Ciudad, RegistroClima, MetricasETL
+
+load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/etl.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+class WeatherstackETL:
+    def __init__(self):
+        self.api_key = os.getenv('API_KEY')
+        self.base_url = os.getenv('WEATHERSTACK_BASE_URL')
+        self.ciudades = [c.strip() for c in os.getenv('CIUDADES').split(',')]
+        self.db = SessionLocal()
+        self.tiempo_inicio = time.time()
+        self.registros_extraidos = 0
+        self.registros_guardados = 0
+        self.registros_fallidos = 0
+
+        if not self.api_key:
+            raise ValueError("API_KEY no configurada en .env")
+
+    def extraer_clima(self, ciudad_nombre):
+        """Extrae datos de clima para una ciudad específica"""
+        try:
+            url = f"{self.base_url}/current"
+            params = {
+                'access_key': self.api_key,
+                'query': ciudad_nombre.strip()
+            }
+
+            response = requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+
+            data = response.json()
+
+            if 'error' in data:
+                logger.error(f"❌ Error en API para {ciudad_nombre}: {data['error']['info']}")
+                self.registros_fallidos += 1
+                return None
+
+            self.registros_extraidos += 1
+            logger.info(f"✅ Datos extraídos para {ciudad_nombre}")
+            return data
+
+        except Exception as e:
+            logger.error(f"❌ Error extrayendo datos para {ciudad_nombre}: {str(e)}")
+            self.registros_fallidos += 1
+            return None
+
+    def procesar_respuesta(self, response_data):
+        """Transforma respuesta JSON a diccionario"""
+        try:
+            current = response_data.get('current', {})
+            location = response_data.get('location', {})
+
+            return {
+                'ciudad': location.get('name'),
+                'pais': location.get('country'),
+                'latitud': location.get('lat'),
+                'longitud': location.get('lon'),
+                'temperatura': current.get('temperature'),
+                'sensacion_termica': current.get('feelslike'),
+                'humedad': current.get('humidity'),
+                'velocidad_viento': current.get('wind_speed'),
+                'descripcion': current.get('weather_descriptions', ['N/A'])[0],
+                'codigo_tiempo': current.get('weather_code')
+            }
+        except Exception as e:
+            logger.error(f"Error procesando respuesta: {str(e)}")
+            return None
+
+    def guardar_en_bd(self, datos_procesados):
+        """Guarda los datos en PostgreSQL"""
+        try:
+            # Busca o crea la ciudad
+            ciudad = self.db.query(Ciudad).filter_by(
+                nombre=datos_procesados['ciudad']
+            ).first()
+
+            if not ciudad:
+                ciudad = Ciudad(
+                    nombre=datos_procesados['ciudad'],
+                    pais=datos_procesados['pais'],
+                    latitud=datos_procesados['latitud'],
+                    longitud=datos_procesados['longitud']
+                )
+                self.db.add(ciudad)
+                self.db.flush()  # Flush para obtener el ID
+
+            # Crea nuevo registro de clima
+            registro = RegistroClima(
+                ciudad_id=ciudad.id,
+                temperatura=datos_procesados['temperatura'],
+                sensacion_termica=datos_procesados['sensacion_termica'],
+                humedad=datos_procesados['humedad'],
+                velocidad_viento=datos_procesados['velocidad_viento'],
+                descripcion=datos_procesados['descripcion'],
+                codigo_tiempo=datos_procesados['codigo_tiempo']
+            )
+
+            self.db.add(registro)
+            self.db.commit()
+            self.registros_guardados += 1
+
+            logger.info(f"📊 Registro guardado para {datos_procesados['ciudad']}")
+            return True
+
+        except IntegrityError as e:
+            self.db.rollback()
+            logger.error(f"Error de integridad: {str(e)}")
+            self.registros_fallidos += 1
+            return False
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error guardando en BD: {str(e)}")
+            self.registros_fallidos += 1
+            return False
+
+    def guardar_metricas(self, estado):
+        """Guarda métricas de la ejecución"""
+        try:
+            tiempo_ejecucion = time.time() - self.tiempo_inicio
+            metricas = MetricasETL(
+                registros_extraidos=self.registros_extraidos,
+                registros_guardados=self.registros_guardados,
+                registros_fallidos=self.registros_fallidos,
+                tiempo_ejecucion_segundos=tiempo_ejecucion,
+                estado=estado,
+                mensaje=f"Extraídos: {self.registros_extraidos}, Guardados: {self.registros_guardados}, Fallidos: {self.registros_fallidos}"
+            )
+            self.db.add(metricas)
+            self.db.commit()
+            logger.info(f"📈 Métricas guardadas: {metricas.mensaje}")
+        except Exception as e:
+            logger.error(f"Error guardando métricas: {str(e)}")
+
+    def ejecutar(self):
+        """Ejecuta el pipeline completo"""
+        try:
+            logger.info(f"Iniciando ETL para {len(self.ciudades)} ciudades...")
+
+            for ciudad in self.ciudades:
+                response = self.extraer_clima(ciudad)
+                if response:
+                    datos = self.procesar_respuesta(response)
+                    if datos:
+                        self.guardar_en_bd(datos)
+
+            # Determina estado
+            estado = "SUCCESS" if self.registros_fallidos == 0 else "PARTIAL"
+            self.guardar_metricas(estado)
+
+            return estado == "SUCCESS"
+
+        except Exception as e:
+            logger.error(f"Error en ETL: {str(e)}")
+            self.guardar_metricas("FAILED")
+            return False
+
+        finally:
+            self.db.close()
+
+    def mostrar_resumen(self):
+        """Muestra resumen de datos en BD"""
+        try:
+            ciudades = self.db.query(Ciudad).count()
+            registros = self.db.query(RegistroClima).count()
+
+            print("\n" + "="*50)
+            print("RESUMEN ETL - DADOS EN POSTGRESQL")
+            print("="*50)
+            print(f"Total Ciudades: {ciudades}")
+            print(f"Total Registros de Clima: {registros}")
+            print(f"Registros Extraídos: {self.registros_extraidos}")
+            print(f"Registros Guardados: {self.registros_guardados}")
+            print(f"Registros Fallidos: {self.registros_fallidos}")
+            print("="*50 + "\n")
+
+        except Exception as e:
+            logger.error(f"Error mostrando resumen: {str(e)}")
+
+if __name__ == "__main__":
+    etl = WeatherstackETL()
+    exito = etl.ejecutar()
+    etl.mostrar_resumen()
+    
+    exit(0 if exito else 1)</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Crea Script de Consultas</h3>
+                <p>Crea <code>scripts/consultas.py</code> para analizar datos guardados:</p>
+                <pre><code>#!/usr/bin/env python3
+import sys
+sys.path.insert(0, '.')
+
+from scripts.database import SessionLocal
+from scripts.models import Ciudad, RegistroClima, MetricasETL
+from sqlalchemy import func
+import pandas as pd
+
+db = SessionLocal()
+
+def temperatura_promedio_por_ciudad():
+    """Temperatura promedio de cada ciudad"""
+    registros = db.query(
+        Ciudad.nombre,
+        func.avg(RegistroClima.temperatura).label('temp_promedio')
+    ).join(RegistroClima).group_by(Ciudad.nombre).all()
+    
+    df = pd.DataFrame(registros, columns=['Ciudad', 'Temperatura Promedio'])
+    print("\n📊 TEMPERATURA PROMEDIO POR CIUDAD:")
+    print(df.to_string(index=False))
+
+def ciudad_mas_humeda():
+    """Identifica ciudad con mayor humedad"""
+    registro = db.query(
+        Ciudad.nombre,
+        RegistroClima.humedad,
+        RegistroClima.fecha_extraccion
+    ).join(Ciudad).order_by(
+        RegistroClima.humedad.desc()
+    ).first()
+    
+    if registro:
+        print(f"\n💧 CIUDAD MÁS HÚMEDA: {registro.nombre} con {registro.humedad}%")
+
+def velocidad_viento_max():
+    """Velocidad máxima de viento registrada"""
+    registro = db.query(
+        Ciudad.nombre,
+        RegistroClima.velocidad_viento
+    ).join(Ciudad).order_by(
+        RegistroClima.velocidad_viento.desc()
+    ).first()
+    
+    if registro:
+        print(f"\n💨 VIENTO MÁS FUERTE: {registro.nombre} con {registro.velocidad_viento} km/h")
+
+def metricas_etl():
+    """Muestra métricas de ejecuciones"""
+    metricas = db.query(MetricasETL).order_by(
+        MetricasETL.fecha_ejecucion.desc()
+    ).limit(5).all()
+    
+    print("\n📈 ÚLTIMAS 5 EJECUCIONES DEL ETL:")
+    for m in metricas:
+        print(f"  - {m.fecha_ejecucion}: {m.estado} ({m.registros_guardados} registros en {m.tiempo_ejecucion_segundos:.2f}s)")
+
+if __name__ == "__main__":
+    try:
+        print("\n" + "="*50)
+        print("ANÁLISIS DE DATOS - POSTGRESQL")
+        print("="*50)
+        
+        temperatura_promedio_por_ciudad()
+        ciudad_mas_humeda()
+        velocidad_viento_max()
+        metricas_etl()
+        
+        print("\n" + "="*50 + "\n")
+        
+    finally:
+        db.close()</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Ejecuta el ETL Mejorado</h3>
+                <p>Con PostgreSQL integrado:</p>
+                <pre><code>python scripts/extractor_db.py</code></pre>
+                <p style="margin-top: 15px;">Luego consulta los datos:</p>
+                <pre><code>python scripts/consultas.py</code></pre>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ ETL Completamente Integrado con PostgreSQL</h4>
+                <p>Tu pipeline ahora:</p>
+                <ul>
+                    <li>✓ Extrae datos de la API</li>
+                    <li>✓ Transforma y valida</li>
+                    <li>✓ Guarda en PostgreSQL (no archivos locales)</li>
+                    <li>✓ Registra métricas de ejecución</li>
+                    <li>✓ Permite consultas complejas con SQL</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="resumen">
+            <h2><i class="fas fa-check-circle"></i> Resumen: De Archivos a Base de Datos</h2>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>❌ Antes: Archivos Locales</h3>
+                    <ul>
+                        <li>Datos en CSV/JSON</li>
+                        <li>Búsquedas lentas</li>
+                        <li>Difícil versionamiento</li>
+                        <li>No soporta transacciones</li>
+                        <li>Escalabilidad limitada</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>✅ Ahora: PostgreSQL</h3>
+                    <ul>
+                        <li>Datos estructurados</li>
+                        <li>Búsquedas rápidas (índices)</li>
+                        <li>Integridad referencial</li>
+                        <li>Transacciones ACID</li>
+                        <li>Escalabilidad empresarial</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🛠️ Tecnologías Aprendidas</h3>
+                    <ul>
+                        <li>PostgreSQL (servidor BD)</li>
+                        <li>psycopg2 (driver Python)</li>
+                        <li>SQLAlchemy (ORM)</li>
+                        <li>Alembic (migraciones)</li>
+                        <li>Modeling relacional</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Mejoras Arquitectónicas</h3>
+                    <ul>
+                        <li>Separación datos/lógica</li>
+                        <li>Consultas avanzadas</li>
+                        <li>Auditoría de cambios</li>
+                        <li>Backups automáticos</li>
+                        <li>Acceso multi-usuario</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>⏱️ Tiempo Total: 60-90 minutos</h3>
+
+            <div class="reflection-box">
+                <h4>🎯 Comparación: Archivo vs Base de Datos</h4>
+                <div class="table-responsive">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Criterio</th>
+                                <th>Archivos (CSV/JSON)</th>
+                                <th>PostgreSQL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Volumen de datos</strong></td>
+                                <td>Hasta GB</td>
+                                <td>Hasta TB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Velocidad de búsqueda</strong></td>
+                                <td>O(n) - lento</td>
+                                <td>O(log n) - rápido</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Integridad de datos</strong></td>
+                                <td>Manual</td>
+                                <td>Automática (constraints)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Concurrencia</strong></td>
+                                <td>Una escritura a la vez</td>
+                                <td>Múltiples usuarios</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Transacciones</strong></td>
+                                <td>No soporta</td>
+                                <td>ACID completo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seguridad</strong></td>
+                                <td>Permisos del SO</td>
+                                <td>Usuarios y roles BD</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Complejidad consultas</strong></td>
+                                <td>Básica (filtros simples)</td>
+                                <td>Avanzada (JOINs, agregaciones)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Costo operativo</strong></td>
+                                <td>Bajo</td>
+                                <td>Medio-Alto</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <h3>🚀 Próximos Pasos Avanzados</h3>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>🔄 Replicación</h3>
+                    <p>Replicar base de datos en múltiples servidores para alta disponibilidad</p>
+                </div>
+
+                <div class="card">
+                    <h3>📈 Analítica</h3>
+                    <p>Crear vistas y cubos OLAP para análisis de datos complejos</p>
+                </div>
+
+                <div class="card">
+                    <h3>☁️ Cloud</h3>
+                    <p>Migrar PostgreSQL a AWS RDS, Google Cloud SQL o Azure Database</p>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Dashboard</h3>
+                    <p>Crear dashboard con Metabase, Tableau o Power BI conectado a PostgreSQL</p>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h4>✨ ¡FELICIDADES!</h4>
+                <p>Has completado la integración de una base de datos profesional a tu ETL. Tu pipeline ahora es:<br><br>
+                <strong>🔄 Escalable ▪️ 🔒 Seguro ▪️ 📊 Potente ▪️ 🚀 Listo para Producción</strong></p>
+                <p style="margin-top: 20px;">Este es un sistema real que usarían empresas Fortune 500 para gestionar millones de registros diarios.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider-thick">
+
+        <section style="background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%); padding: 40px; border-radius: 10px; margin: 30px 0;">
+            <h2 style="border-left: 5px solid var(--success-color); color: var(--primary-color);">📚 Estructura Final del Proyecto</h2>
+            
+            <pre style="background: #000000; color: #ffffff; border: 2px solid var(--secondary-color);"><code>etl-weatherstack/
+├── alembic/                  # Migraciones de BD
+│   ├── versions/
+│   │   └── xxx_initial_migration.py
+│   ├── env.py
+│   ├── script.py.mako
+│   └── alembic.ini
+├── scripts/
+│   ├── database.py          # ⭐ Configuración PostgreSQL
+│   ├── models.py            # ⭐ Modelos ORM
+│   ├── extractor.py         # Original (archivos)
+│   ├── extractor_db.py      # ⭐ Nuevo (base de datos)
+│   ├── consultas.py         # ⭐ Análisis de datos
+│   ├── test_db.py           # ⭐ Prueba conexión
+│   └── visualizador.py
+├── data/
+│   ├── clima.csv
+│   └── clima_raw.json
+├── logs/
+│   └── etl.log
+├── .env                     # Variables de entorno
+├── .gitignore
+├── requirements.txt         # ⭐ Con nuevas dependencias
+├── README.md
+└── postgres_setup.md        # ⭐ Documentación DB
+</code></pre>
+        </section>
+
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p><strong>Corporación Universitaria de Huila (CORHUILA)</strong></p>
+            <p>Ingeniería de Sistemas | Minería de Datos 2026</p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
+                Material Educativo - Uso Académico Autorizado | 
+                <a href="https://www.corhuila.edu.co" target="_blank">www.corhuila.edu.co</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.95;">
+                📚 Desarrollado por: <strong>Ing. Julian Quimbayo Castro</strong>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.85em;">
+                © 2026 Todos los derechos reservados
+            </p>
+        </div>
+    </footer>
+
+    <button id="scrollTopBtn" title="Volver arriba">↑</button>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupScrollButton();
+    setupNavigation();
+    setupSmoothScroll();
+    highlightActiveSection();
+});
+
+function setupScrollButton() {
+    const scrollBtn = document.getElementById('scrollTopBtn');
+
+    window.addEventListener('scroll', function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            scrollBtn.style.display = 'block';
+        } else {
+            scrollBtn.style.display = 'none';
+        }
+    });
+
+    scrollBtn.addEventListener('click', function() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+}
+
+function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({behavior: 'smooth'});
+            }
+        });
+    });
+}
+
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.main-nav a');
+    window.addEventListener('scroll', highlightActiveSection);
+}
+
+function highlightActiveSection() {
+    const navLinks = document.querySelectorAll('.main-nav a');
+    let current = '';
+
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').slice(1) === current) {
+            link.classList.add('active');
+        }
+    });
+}
+
+document.querySelectorAll('pre').forEach(pre => {
+    const button = document.createElement('button');
+    button.textContent = '📋 Copiar';
+    button.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #2a5298;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    `;
+
+    pre.style.position = 'relative';
+    pre.appendChild(button);
+
+    pre.addEventListener('mouseenter', () => {
+        button.style.opacity = '1';
+    });
+
+    pre.addEventListener('mouseleave', () => {
+        button.style.opacity = '0';
+    });
+
+    button.addEventListener('click', () => {
+        const text = pre.querySelector('code').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            button.textContent = '✅ Copiado!';
+            setTimeout(() => {
+                button.textContent = '📋 Copiar';
+            }, 2000);
+        });
+    });
+});
+    </script>
+</body>
+</html>

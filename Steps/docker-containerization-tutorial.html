@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Containerización con Docker | Minería de Datos | Ingeniería de Sistemas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #1e3c72;
+    --secondary-color: #2a5298;
+    --accent-color: #ff6b6b;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --border-color: #e0e0e0;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --code-bg: #2d2d2d;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-text);
+    background-color: #fff;
+}
+
+/* Header */
+.main-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 0;
+}
+
+.top-bar {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    text-align: center;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.main-nav {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--accent-color);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Main Content */
+.main-content {
+    padding: 50px 0;
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h2 {
+    color: var(--secondary-color);
+    font-size: 2em;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--accent-color);
+    padding-left: 15px;
+}
+
+h3 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+h4 {
+    color: var(--secondary-color);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 60px 40px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.hero-section h1 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.hero-section .lead {
+    font-size: 1.2em;
+    line-height: 1.8;
+}
+
+.lead {
+    font-size: 1.1em;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+
+/* Dividers */
+.divider {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 40px 0;
+}
+
+.divider-thick {
+    border: none;
+    border-top: 3px solid var(--accent-color);
+    margin: 50px 0;
+}
+
+/* Definition Box */
+.definition-box {
+    background-color: #e8f4f8;
+    border-left: 5px solid var(--secondary-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    font-size: 1.05em;
+}
+
+/* Reflection Box */
+.reflection-box {
+    background-color: #fff3cd;
+    border-left: 5px solid var(--warning-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.reflection-box h4 {
+    color: #856404;
+    margin-bottom: 10px;
+}
+
+.reflection-box p,
+.reflection-box ul {
+    color: #856404;
+    line-height: 1.7;
+}
+
+.reflection-box ul {
+    margin-left: 20px;
+}
+
+.reflection-box li {
+    margin-bottom: 8px;
+}
+
+/* Success Box */
+.success-box {
+    background-color: #d4edda;
+    border-left: 5px solid var(--success-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.success-box h4 {
+    color: #155724;
+    margin-bottom: 10px;
+}
+
+.success-box p {
+    color: #155724;
+    line-height: 1.7;
+}
+
+/* Cards */
+.card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin: 15px 0;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card h3,
+.card h4 {
+    color: var(--secondary-color);
+    margin-top: 0;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+/* Code Blocks */
+pre {
+    background-color: var(--code-bg);
+    color: #f8f8f2;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.95em;
+    line-height: 1.5;
+    border-left: 4px solid var(--accent-color);
+    position: relative;
+}
+
+code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--primary-color);
+}
+
+pre code {
+    background-color: transparent;
+    color: #f8f8f2;
+    padding: 0;
+}
+
+/* Step Box */
+.step-box {
+    background-color: var(--light-bg);
+    border-left: 5px solid var(--secondary-color);
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.step-number {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.step-box h3 {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+}
+
+.step-box h3 .step-number {
+    margin-top: 0;
+}
+
+/* Tables */
+.table-responsive {
+    overflow-x: auto;
+    margin: 30px 0;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.styled-table thead tr {
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: left;
+    font-weight: 500;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.styled-table tbody tr:hover {
+    background-color: var(--light-bg);
+}
+
+.styled-table tbody tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+/* Lists */
+ul, ol {
+    margin: 15px 0;
+    margin-left: 30px;
+}
+
+li {
+    margin: 8px 0;
+    line-height: 1.7;
+}
+
+/* Links */
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Feature List */
+.feature-list {
+    list-style: none;
+    margin: 20px 0;
+}
+
+.feature-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.feature-list li:before {
+    content: "✓ ";
+    color: var(--success-color);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Footer */
+.main-footer {
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 40px 0;
+    margin-top: 50px;
+}
+
+.main-footer p {
+    margin: 8px 0;
+    font-size: 0.95em;
+}
+
+.main-footer ul {
+    list-style: none;
+    margin-top: 20px;
+}
+
+.main-footer li {
+    margin: 8px 0;
+}
+
+.main-footer a {
+    color: #fff9e6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.main-footer a:hover {
+    color: var(--accent-color);
+}
+
+/* Scroll to Top Button */
+#scrollTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 99;
+    transition: background-color 0.3s;
+}
+
+#scrollTopBtn:hover {
+    background-color: var(--accent-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h2 {
+        font-size: 1.5em;
+    }
+    
+    .hero-section {
+        padding: 40px 20px;
+    }
+    
+    .main-nav ul {
+        flex-direction: column;
+    }
+    
+    .main-nav a {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .styled-table {
+        font-size: 0.9em;
+    }
+    
+    .styled-table th,
+    .styled-table td {
+        padding: 10px;
+    }
+    
+    pre {
+        font-size: 0.85em;
+        padding: 15px;
+    }
+
+    .brand-container {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .brand-name {
+        font-size: 14px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="top-bar">
+            <div class="brand-container">
+                <img src="https://raw.githubusercontent.com/code-corhuila/material-mineria-datos/b3725d694125ab35294ddfe415a327bc1445d32c/01-week/01-session/LOGO%20CORHUILA%20BLANCO%20PNG%20(2).png" alt="Logo Corhuila" class="logo-img">
+                <div>
+                    <div class="brand-name">CORHUILA - Corporación Universitaria de Huila</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Ingeniería de Sistemas | Minería de Datos</div>
+                </div>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#introduccion" class="nav-link">Introducción</a></li>
+                <li><a href="#docker-setup" class="nav-link">Docker Setup</a></li>
+                <li><a href="#dockerfile" class="nav-link">Dockerfile</a></li>
+                <li><a href="#docker-compose" class="nav-link">Docker Compose</a></li>
+                <li><a href="#construccion-ejecucion" class="nav-link">Build & Run</a></li>
+                <li><a href="#resumen" class="nav-link">Resumen</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container main-content">
+
+        <section id="introduccion" class="hero-section">
+            <h1>🐳 Containerización con Docker</h1>
+            <p class="lead">Empaqueta tu aplicación completa en contenedores para despliegue consistente en cualquier entorno</p>
+            <p style="margin-top: 20px; font-size: 1em; opacity: 0.95;">
+                Desde desarrollo local hasta producción en la nube, garantiza que tu ETL y Dashboard funcionen idénticamente en todos lados
+            </p>
+        </section>
+
+        <hr class="divider">
+
+        <section id="docker-setup">
+            <h2><i class="fas fa-cube"></i> Fase 1: Instalación de Docker</h2>
+
+            <p>Docker es una plataforma de containerización que permite empaquetar aplicaciones con todas sus dependencias.</p>
+
+            <div class="definition-box">
+                <h4>¿Qué es Docker?</h4>
+                <p>Docker es un contenedor que aísla tu aplicación (código, dependencias, configuración) en una unidad independiente que funciona igual en desarrollo, testing y producción. Es como una máquina virtual pero mucho más liviana.</p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Instala Docker Desktop (Windows/Mac)</h3>
+                <p>Ve a <a href="https://www.docker.com/products/docker-desktop" target="_blank">docker.com/products/docker-desktop</a></p>
+                <ul>
+                    <li>Descarga Docker Desktop para tu SO</li>
+                    <li>Ejecuta el instalador</li>
+                    <li>Sigue el asistente de instalación</li>
+                    <li>Reinicia tu computadora</li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Instalación en Linux</h3>
+                <p>Si estás en Linux o WSL, usa el comando:</p>
+                <pre><code>sudo apt update
+sudo apt install -y docker.io docker-compose
+
+# Dale permisos al usuario actual
+sudo usermod -aG docker $USER
+
+# Reinicia sesión o ejecuta:
+newgrp docker</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Verifica Instalación</h3>
+                <p>Comprueba que Docker está funcionando:</p>
+                <pre><code>docker --version
+docker run hello-world
+
+# Deberías ver un mensaje de bienvenida de Docker</code></pre>
+            </div>
+
+            <div class="reflection-box">
+                <h4>📦 Conceptos Clave de Docker</h4>
+                <ul>
+                    <li><strong>Imagen:</strong> Plantilla con tu aplicación y dependencias</li>
+                    <li><strong>Contenedor:</strong> Instancia ejecutable de una imagen</li>
+                    <li><strong>Dockerfile:</strong> Archivo que define cómo construir la imagen</li>
+                    <li><strong>Docker Compose:</strong> Herramienta para ejecutar múltiples contenedores</li>
+                    <li><strong>Registry:</strong> Repositorio de imágenes (Docker Hub)</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Docker Instalado</h4>
+                <p>Estás listo para containerizar tu aplicación.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="dockerfile">
+            <h2><i class="fas fa-file-code"></i> Fase 2: Crear Dockerfile</h2>
+
+            <p>Un Dockerfile es un script que define los pasos para construir tu imagen Docker.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Crea el Dockerfile</h3>
+                <p>En la raíz de tu proyecto, crea <code>Dockerfile</code> (sin extensión):</p>
+                <pre><code># Usar imagen base oficial de Python
+FROM python:3.11-slim
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar requirements.txt
+COPY requirements.txt .
+
+# Instalar dependencias Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar todo el código del proyecto
+COPY . .
+
+# Crear directorios necesarios
+RUN mkdir -p logs data
+
+# Exponer puerto 8501 (Streamlit)
+EXPOSE 8501
+
+# Variable de entorno para Python
+ENV PYTHONUNBUFFERED=1
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)"
+
+# Comando por defecto: ejecutar Streamlit
+CMD ["streamlit", "run", "dashboard_interactive.py", "--server.port=8501", "--server.address=0.0.0.0"]</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Crea .dockerignore</h3>
+                <p>En la raíz del proyecto, crea <code>.dockerignore</code> para excluir archivos innecesarios:</p>
+                <pre><code># Control de versiones
+.git
+.gitignore
+.github
+
+# Ambientes virtuales
+venv/
+env/
+ENV/
+.venv
+
+# Caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# Variables de entorno locales
+.env
+.env.local
+.streamlit/secrets.toml
+
+# IDE y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+.DS_Store?
+
+# Datos locales
+data/
+logs/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentación
+README.md
+docs/</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Construir la Imagen</h3>
+                <p>Desde la raíz del proyecto:</p>
+                <pre><code>docker build -t etl-weatherstack:1.0 .
+
+# Ver la imagen creada
+docker images</code></pre>
+                <p style="margin-top: 15px;">Esto tardará un par de minutos mientras descarga la imagen base e instala dependencias.</p>
+            </div>
+
+            <div class="reflection-box">
+                <h4>🔍 Explicación del Dockerfile</h4>
+                <ul>
+                    <li><code>FROM python:3.11-slim</code> - Imagen base pequeña de Python</li>
+                    <li><code>WORKDIR /app</code> - Directorio de trabajo dentro del contenedor</li>
+                    <li><code>COPY requirements.txt .</code> - Copia dependencias</li>
+                    <li><code>RUN pip install...</code> - Instala paquetes Python</li>
+                    <li><code>COPY . .</code> - Copia todo el código</li>
+                    <li><code>EXPOSE 8501</code> - Abre puerto para Streamlit</li>
+                    <li><code>CMD</code> - Comando a ejecutar cuando inicia el contenedor</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Imagen Docker Construida</h4>
+                <p>Tienes una imagen con tu app lista para ejecutarse.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="docker-compose">
+            <h2><i class="fas fa-layer-group"></i> Fase 3: Docker Compose (Multi-contenedor)</h2>
+
+            <p>Docker Compose permite orquestar múltiples contenedores (app + PostgreSQL) con un solo comando.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Crea docker-compose.yml</h3>
+                <p>En la raíz del proyecto:</p>
+                <pre><code>version: '3.8'
+
+services:
+  # Servicio PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: weatherstack_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password_segura
+      POSTGRES_DB: weatherstack_etl
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persiste datos en volumen
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - etl-network
+
+  # Servicio de la aplicación Streamlit
+  app:
+    build: .
+    container_name: weatherstack_app
+    environment:
+      # Variables de conexión a BD
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres_password_segura
+      DB_NAME: weatherstack_etl
+      API_KEY: ${API_KEY}
+      WEATHERSTACK_BASE_URL: https://api.weatherstack.com
+      CIUDADES: Bogota,Medellin,Cali,Barranquilla,Cartagena
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # Monta código local para desarrollo (hot reload)
+      - .:/app
+      - /app/__pycache__
+    networks:
+      - etl-network
+    command: streamlit run dashboard_interactive.py --server.port=8501 --server.address=0.0.0.0
+
+# Volúmenes persistentes
+volumes:
+  postgres_data:
+    driver: local
+
+# Red personalizada
+networks:
+  etl-network:
+    driver: bridge</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Crea archivo .env para Docker</h3>
+                <p>Crea <code>.env.docker</code> con variables seguras:</p>
+                <pre><code>API_KEY=tu_api_key_aqui
+DB_HOST=postgres
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=tu_contraseña_muy_segura
+DB_NAME=weatherstack_etl</code></pre>
+                <p style="margin-top: 15px;"><strong>⚠️ Nunca commiteaes este archivo a Git.</strong></p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Ejecuta Docker Compose</h3>
+                <p>Construye e inicia todos los servicios:</p>
+                <pre><code># Construir imágenes
+docker-compose build
+
+# Iniciar servicios en background
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f app
+
+# Ver estado de servicios
+docker-compose ps</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Accede a tu Dashboard</h3>
+                <p>Tu aplicación estará disponible en:</p>
+                <pre><code>http://localhost:8501</code></pre>
+                <p style="margin-top: 15px;">PostgreSQL también estará corriendo en el puerto 5432 interno.</p>
+            </div>
+
+            <div class="reflection-box">
+                <h4>🔗 Ventajas de Docker Compose</h4>
+                <ul>
+                    <li>✅ Crea múltiples contenedores con un comando</li>
+                    <li>✅ Red interna entre contenedores</li>
+                    <li>✅ Volúmenes persistentes para BD</li>
+                    <li>✅ Variables de entorno centralizadas</li>
+                    <li>✅ Health checks automáticos</li>
+                    <li>✅ Fácil de reproducir en cualquier máquina</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Contenedores Orquestados</h4>
+                <p>Tu aplicación y base de datos funcionan juntas en contenedores aislados.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="construccion-ejecucion">
+            <h2><i class="fas fa-terminal"></i> Fase 4: Build y Run Detallado</h2>
+
+            <p>Comandos útiles para trabajar con Docker en desarrollo.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Comandos Docker Básicos</h3>
+                <pre><code># Ver imágenes disponibles
+docker images
+
+# Ver contenedores en ejecución
+docker ps
+
+# Ver todos los contenedores (incluyendo detenidos)
+docker ps -a
+
+# Detener un contenedor
+docker stop nombre_contenedor
+
+# Eliminar un contenedor
+docker rm nombre_contenedor
+
+# Ver logs en tiempo real
+docker logs -f nombre_contenedor
+
+# Ejecutar comando dentro del contenedor
+docker exec -it nombre_contenedor bash</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Comandos Docker Compose</h3>
+                <pre><code># Construir imágenes
+docker-compose build
+
+# Iniciar servicios
+docker-compose up
+
+# Iniciar en background (-d = detached)
+docker-compose up -d
+
+# Detener servicios
+docker-compose down
+
+# Ver logs de un servicio
+docker-compose logs -f app
+
+# Ver estado
+docker-compose ps
+
+# Ejecutar comando en un contenedor
+docker-compose exec app bash
+
+# Reconstruir después de cambios
+docker-compose up -d --build</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Debugging en Contenedor</h3>
+                <p>Si algo no funciona, conecta al contenedor:</p>
+                <pre><code># Acceder a bash del contenedor app
+docker-compose exec app bash
+
+# Una vez dentro:
+python scripts/test_db.py  # Prueba conexión BD
+python scripts/extractor_db.py  # Ejecuta ETL
+ls -la  # Lista archivos
+cat logs/etl.log  # Ver logs
+
+# Salir
+exit</code></pre>
+            </div>
+
+            <div class="reflection-box">
+                <h4>🐛 Solución de Problemas Comunes</h4>
+                <ul>
+                    <li><strong>Puerto en uso:</strong> <code>docker-compose down</code> y luego <code>up</code></li>
+                    <li><strong>BD no conecta:</strong> Verifica que postgres esté healthy: <code>docker-compose ps</code></li>
+                    <li><strong>Cambios no se ven:</strong> Reconstruye: <code>docker-compose up -d --build</code></li>
+                    <li><strong>Ver logs:</strong> <code>docker-compose logs -f nombre_servicio</code></li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Contenedores Funcionando</h4>
+                <p>Tu pila completa (PostgreSQL + Streamlit) está corriendo en contenedores.</p>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <section id="resumen">
+            <h2><i class="fas fa-check-circle"></i> Resumen: De Código a Contenedores</h2>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>📦 Fase 1: Setup</h3>
+                    <p><strong>15 minutos</strong></p>
+                    <ul style="margin-left: 0; list-style: none;">
+                        <li>✅ Instalar Docker</li>
+                        <li>✅ Verificar instalación</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🔨 Fase 2: Dockerfile</h3>
+                    <p><strong>20 minutos</strong></p>
+                    <ul style="margin-left: 0; list-style: none;">
+                        <li>✅ Crear Dockerfile</li>
+                        <li>✅ Crear .dockerignore</li>
+                        <li>✅ Build de imagen</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🎼 Fase 3: Docker Compose</h3>
+                    <p><strong>30 minutos</strong></p>
+                    <ul style="margin-left: 0; list-style: none;">
+                        <li>✅ Crear compose file</li>
+                        <li>✅ Orquestar servicios</li>
+                        <li>✅ Ejecutar stack</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>⚙️ Fase 4: Debug</h3>
+                    <p><strong>20 minutos</strong></p>
+                    <ul style="margin-left: 0; list-style: none;">
+                        <li>✅ Comandos útiles</li>
+                        <li>✅ Ver logs</li>
+                        <li>✅ Troubleshooting</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>✨ Resultado Final</h3>
+                    <p><strong>APP EN PRODUCCIÓN</strong></p>
+                    <ul style="margin-left: 0; list-style: none;">
+                        <li>✅ Reproducible</li>
+                        <li>✅ Escalable</li>
+                        <li>✅ Segura</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>⏱️ Tiempo Total: 1.5-2 horas</h3>
+
+            <div class="reflection-box">
+                <h4>🎯 Evolución del Proyecto</h4>
+                <p><strong>Fase 1:</strong> Extracción → API + CSV/JSON</p>
+                <p><strong>Fase 2:</strong> Almacenamiento → PostgreSQL + ORM</p>
+                <p><strong>Fase 3:</strong> Visualización → Streamlit Dashboard</p>
+                <p><strong>Fase 4:</strong> Containerización → Docker + Docker Compose</p>
+                <p style="margin-top: 20px; font-weight: bold;">🏆 Resultado: Un sistema profesional, escalable y listo para producción.</p>
+            </div>
+
+            <div class="success-box">
+                <h4>✨ ¡PROYECTO COMPLETAMENTE CONTAINERIZADO!</h4>
+                <p>Has creado un sistema ETL profesional que:</p>
+                <ul>
+                    <li>🔄 Extrae datos de APIs (Weatherstack)</li>
+                    <li>💾 Almacena en base de datos (PostgreSQL)</li>
+                    <li>📊 Visualiza con dashboard interactivo (Streamlit)</li>
+                    <li>🐳 Se ejecuta en contenedores (Docker)</li>
+                    <li>🔧 Orquestado con Docker Compose para desarrollo</li>
+                </ul>
+                <p style="margin-top: 20px;">Este es el tipo de arquitectura que usan empresas profesionales. ¡Felicidades! 🎉</p>
+            </div>
+
+        </section>
+
+        <hr class="divider-thick">
+
+        <section style="background: linear-gradient(135deg, #f8f9fa 0%, #e8f4f8 100%); padding: 40px; border-radius: 10px; margin: 30px 0;">
+            <h2 style="border-left: 5px solid var(--success-color); color: var(--primary-color);">📚 Estructura Final del Proyecto Containerizado</h2>
+            
+            <pre style="background: #000000; color: #ffffff; border: 2px solid var(--secondary-color);"><code>etl-weatherstack/
+├── .github/
+│   └── workflows/
+│       └── docker-build.yml         # ⭐ CI/CD automático
+├── alembic/                         # Migraciones DB
+├── scripts/
+│   ├── database.py
+│   ├── models.py
+│   ├── extractor_db.py
+│   └── consultas.py
+├── dashboard_app.py
+├── dashboard_interactive.py
+├── Dockerfile                       # ⭐ Definición imagen
+├── docker-compose.yml               # ⭐ Orquestación
+├── .dockerignore                    # ⭐ Exclusiones Docker
+├── .env.docker                      # ⭐ Variables de producción
+├── requirements.txt
+├── .gitignore
+└── README.md                        # Documentación completa
+</code></pre>
+        </section>
+
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p><strong>Corporación Universitaria de Huila (CORHUILA)</strong></p>
+            <p>Ingeniería de Sistemas | Minería de Datos 2026</p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
+                Material Educativo - Uso Académico Autorizado | 
+                <a href="https://www.corhuila.edu.co" target="_blank">www.corhuila.edu.co</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.95;">
+                📚 Desarrollado por: <strong>Ing. Julian Quimbayo Castro</strong>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.85em;">
+                © 2026 Todos los derechos reservados
+            </p>
+        </div>
+    </footer>
+
+    <button id="scrollTopBtn" title="Volver arriba">↑</button>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupScrollButton();
+    setupNavigation();
+    setupSmoothScroll();
+    highlightActiveSection();
+});
+
+function setupScrollButton() {
+    const scrollBtn = document.getElementById('scrollTopBtn');
+
+    window.addEventListener('scroll', function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            scrollBtn.style.display = 'block';
+        } else {
+            scrollBtn.style.display = 'none';
+        }
+    });
+
+    scrollBtn.addEventListener('click', function() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+}
+
+function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({behavior: 'smooth'});
+            }
+        });
+    });
+}
+
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.main-nav a');
+    window.addEventListener('scroll', highlightActiveSection);
+}
+
+function highlightActiveSection() {
+    const navLinks = document.querySelectorAll('.main-nav a');
+    let current = '';
+
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').slice(1) === current) {
+            link.classList.add('active');
+        }
+    });
+}
+
+document.querySelectorAll('pre').forEach(pre => {
+    const button = document.createElement('button');
+    button.textContent = '📋 Copiar';
+    button.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #2a5298;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    `;
+
+    pre.style.position = 'relative';
+    pre.appendChild(button);
+
+    pre.addEventListener('mouseenter', () => {
+        button.style.opacity = '1';
+    });
+
+    pre.addEventListener('mouseleave', () => {
+        button.style.opacity = '0';
+    });
+
+    button.addEventListener('click', () => {
+        const text = pre.querySelector('code').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            button.textContent = '✅ Copiado!';
+            setTimeout(() => {
+                button.textContent = '📋 Copiar';
+            }, 2000);
+        });
+    });
+});
+    </script>
+</body>
+</html>
