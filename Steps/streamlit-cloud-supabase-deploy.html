@@ -708,11 +708,6 @@ a:hover {
                     </li>
                     <li>Clic en <strong>Create new project</strong> — espera ~2 minutos</li>
                 </ol>
-                <div class="screenshot-placeholder">
-                    <i class="fas fa-image"></i>
-                    <strong>Pantalla: Supabase New Project</strong><br>
-                    Completa Name, Database Password y Region antes de crear
-                </div>
             </div>
 
             <div class="step-box">
@@ -772,27 +767,128 @@ a:hover {
             </div>
 
             <div class="step-box">
-                <h3><span class="step-number">3</span>Verificar Datos en Supabase</h3>
-                <p>Antes de desplegar, confirma que los datos ya están cargados en Supabase:</p>
-                <ol>
-                    <li>En el panel de Supabase, ve a <strong>Table Editor</strong></li>
-                    <li>Deberías ver las tablas: <code>ciudades</code>, <code>registros_clima</code>, <code>metricas_etl</code></li>
-                    <li>Verifica que <code>registros_clima</code> tenga registros (al menos 1000)</li>
-                </ol>
-                <p style="margin-top: 15px;">Si las tablas no existen aún, ejecuta en tu entorno local:</p>
-                <pre><code># Crea las tablas en Supabase
-python scripts/test_db.py
+                <h3><span class="step-number">3</span>Crear las Tablas vía SQL Editor de Supabase</h3>
+                <p>En el panel de Supabase, ve a <strong>SQL Editor</strong> (ícono de terminal <code>&gt;_</code> en la barra lateral). Crea un <strong>New query</strong> y ejecuta el siguiente SQL para crear las 3 tablas del proyecto:</p>
+                <pre><code>-- ══════════════════════════════════════════════════════════════
+-- TABLA 1: ciudades
+-- ══════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS ciudades (
+    id          SERIAL PRIMARY KEY,
+    nombre      VARCHAR(100) NOT NULL UNIQUE,
+    pais        VARCHAR(100) NOT NULL,
+    latitud     DOUBLE PRECISION,
+    longitud    DOUBLE PRECISION,
+    fecha_creacion TIMESTAMP DEFAULT NOW(),
+    activa      BOOLEAN DEFAULT TRUE
+);
 
-# Genera datos sintéticos
+CREATE INDEX IF NOT EXISTS ix_ciudades_nombre ON ciudades (nombre);
+
+-- ══════════════════════════════════════════════════════════════
+-- TABLA 2: registros_clima
+-- ══════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS registros_clima (
+    id               SERIAL PRIMARY KEY,
+    ciudad_id        INTEGER NOT NULL REFERENCES ciudades(id),
+    temperatura      DOUBLE PRECISION NOT NULL,
+    sensacion_termica DOUBLE PRECISION,
+    humedad          DOUBLE PRECISION NOT NULL,
+    velocidad_viento DOUBLE PRECISION NOT NULL,
+    descripcion      VARCHAR(255) NOT NULL,
+    codigo_tiempo    INTEGER,
+    fecha_extraccion TIMESTAMP DEFAULT NOW(),
+    fecha_creacion   TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS ix_registros_clima_ciudad_id
+    ON registros_clima (ciudad_id);
+CREATE INDEX IF NOT EXISTS ix_registros_clima_fecha_extraccion
+    ON registros_clima (fecha_extraccion);
+CREATE INDEX IF NOT EXISTS idx_ciudad_fecha
+    ON registros_clima (ciudad_id, fecha_extraccion);
+
+-- ══════════════════════════════════════════════════════════════
+-- TABLA 3: metricas_etl
+-- ══════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS metricas_etl (
+    id                       SERIAL PRIMARY KEY,
+    fecha_ejecucion          TIMESTAMP DEFAULT NOW(),
+    registros_extraidos      INTEGER NOT NULL,
+    registros_guardados      INTEGER NOT NULL,
+    registros_fallidos       INTEGER DEFAULT 0,
+    tiempo_ejecucion_segundos DOUBLE PRECISION NOT NULL,
+    estado                   VARCHAR(50) NOT NULL,
+    mensaje                  VARCHAR(500)
+);
+
+CREATE INDEX IF NOT EXISTS ix_metricas_etl_fecha
+    ON metricas_etl (fecha_ejecucion);</code></pre>
+                <p style="margin-top: 10px;">Clic en <strong>Run</strong> (o <code>Ctrl+Enter</code>). Deberías ver <em>"Success. No rows returned"</em> — las tablas se crearon correctamente.</p>
+
+                <div class="info-box">
+                    <h4>📌 ¿Por qué crear las tablas por SQL y no desde Python?</h4>
+                    <p>Aunque SQLAlchemy puede crear tablas con <code>Base.metadata.create_all()</code>, hacerlo directamente en el SQL Editor de Supabase tiene ventajas:</p>
+                    <ul>
+                        <li>Verificas visualmente la estructura antes de cargar datos</li>
+                        <li>No necesitas configurar la conexión local para crear tablas</li>
+                        <li>Puedes inspeccionar el esquema en <strong>Table Editor</strong> inmediatamente</li>
+                        <li>Es más didáctico — ves el SQL real que genera el ORM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Verificar las Tablas Creadas</h3>
+                <p>Ve a <strong>Table Editor</strong> en el panel izquierdo de Supabase. Deberías ver las 3 tablas:</p>
+                <ul>
+                    <li><code>ciudades</code> — 7 columnas (id, nombre, pais, latitud, longitud, fecha_creacion, activa)</li>
+                    <li><code>registros_clima</code> — 10 columnas (id, ciudad_id, temperatura, sensacion_termica, humedad, velocidad_viento, descripcion, codigo_tiempo, fecha_extraccion, fecha_creacion)</li>
+                    <li><code>metricas_etl</code> — 8 columnas (id, fecha_ejecucion, registros_extraidos, registros_guardados, registros_fallidos, tiempo_ejecucion_segundos, estado, mensaje)</li>
+                </ul>
+                <p style="margin-top: 10px;">Las tablas están vacías — las poblaremos desde Python en el siguiente paso.</p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">5</span>Cargar Datos desde el Entorno Local</h3>
+                <p>Configura las credenciales del pooler en tu archivo <code>.env</code> local:</p>
+                <pre><code># .env — credenciales del pooler de Supabase
+DB_HOST=aws-1-us-east-2.pooler.supabase.com
+DB_PORT=6543
+DB_USER=postgres.tu_project_ref_aqui
+DB_PASSWORD=tu_password_de_supabase
+DB_NAME=postgres</code></pre>
+                <p style="margin-top: 15px;">Luego ejecuta la carga de datos:</p>
+                <pre><code># Activa el entorno virtual
+source venv/bin/activate
+
+# Genera los 1000 registros sintéticos de clima
 python scripts/demo_data.py
+
+# Transforma los datos (limpieza y categorización)
 python scripts/transformador.py
 
-# Carga los datos (bulk insert ~5 segundos)
-python scripts/extractor_db.py</code></pre>
+# Carga los datos en Supabase (bulk insert, ~5 segundos)
+python scripts/extractor_db.py
+
+# Salida esperada:
+# 📊 1000 registros a procesar
+# 🏙️  Ciudad registrada: Bogotá
+# 🏙️  Ciudad registrada: Medellín
+# 🏙️  Ciudad registrada: Cali
+# 🏙️  Ciudad registrada: Barranquilla
+# 🏙️  Ciudad registrada: Cartagena
+# ✅ Bulk insert completado: 1000 registros
+# ✅ ETL completado — Guardados: 1000 | Fallidos: 0</code></pre>
+                <p style="margin-top: 10px;">Regresa al <strong>Table Editor</strong> de Supabase y verifica:</p>
+                <ul>
+                    <li><code>ciudades</code> → 5 filas (Bogotá, Medellín, Cali, Barranquilla, Cartagena)</li>
+                    <li><code>registros_clima</code> → 1000 filas (200 por ciudad × 5 ciudades)</li>
+                    <li><code>metricas_etl</code> → 1 fila con estado <code>SUCCESS</code></li>
+                </ul>
 
                 <div class="success-box">
                     <h4>✅ Supabase listo</h4>
-                    <p>Tienes las credenciales del pooler y los datos cargados. El próximo paso es preparar el código para el despliegue.</p>
+                    <p>Tienes las tablas creadas por SQL, los datos cargados por bulk insert, y las credenciales del pooler. El próximo paso es preparar el código para el despliegue.</p>
                 </div>
             </div>
         </section>
@@ -1042,11 +1138,6 @@ git push origin main</code></pre>
                     <li>Autoriza la app de Streamlit en tu cuenta de GitHub</li>
                     <li>Completa el perfil si es la primera vez</li>
                 </ol>
-                <div class="screenshot-placeholder">
-                    <i class="fas fa-image"></i>
-                    <strong>Pantalla: share.streamlit.io</strong><br>
-                    Dashboard de Streamlit Cloud — verás "New app" en la esquina superior derecha
-                </div>
             </div>
 
             <div class="step-box">
@@ -1070,11 +1161,6 @@ git push origin main</code></pre>
                         </div>
                     </li>
                 </ol>
-                <div class="screenshot-placeholder">
-                    <i class="fas fa-image"></i>
-                    <strong>Pantalla: New App — Deploy from GitHub</strong><br>
-                    Selecciona el repositorio, rama main y el archivo dashboard_interactive.py
-                </div>
             </div>
 
             <div class="step-box">
@@ -1106,11 +1192,6 @@ git push origin main</code></pre>
                     </ul>
                 </div>
 
-                <div class="screenshot-placeholder">
-                    <i class="fas fa-image"></i>
-                    <strong>Pantalla: Advanced settings</strong><br>
-                    Python version → selecciona 3.11 antes de hacer Deploy
-                </div>
             </div>
 
             <div class="step-box">
@@ -1138,12 +1219,6 @@ DB_NAME = "postgres"</code></pre>
                     <li>Clic en <strong>Save</strong> — la app se reinicia automáticamente</li>
                 </ol>
 
-                <div class="screenshot-placeholder">
-                    <i class="fas fa-image"></i>
-                    <strong>Pantalla: Secrets Editor</strong><br>
-                    Pega las credenciales en formato TOML — DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
-                </div>
-
                 <div class="reflection-box">
                     <h4>⚠️ Formato TOML obligatorio</h4>
                     <p>Los secrets deben estar en formato TOML (igual que el archivo <code>secrets.toml</code>). Las claves son strings, van entre comillas dobles. Usar comillas simples o formato JSON causará errores de parseo.</p>
@@ -1167,11 +1242,6 @@ DB_NAME = "postgres"</code></pre>
                     <li>Al finalizar, la app abre automáticamente en la URL asignada</li>
                 </ol>
 
-                <div class="screenshot-placeholder">
-                    <i class="fas fa-image"></i>
-                    <strong>Pantalla: Deploy Log</strong><br>
-                    Verás el log de instalación en tiempo real — espera hasta "Your app is live!"
-                </div>
             </div>
 
             <div class="success-box">
