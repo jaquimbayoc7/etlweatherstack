@@ -13,23 +13,30 @@ logger = logging.getLogger(__name__)
 # Lee credenciales: primero intenta st.secrets (Streamlit Cloud),
 # si no está disponible usa variables de entorno (.env local)
 def _get_db_config():
+    # Intento 1: st.secrets (disponible en Streamlit Cloud y en local con secrets.toml)
     try:
         import streamlit as st
-        return {
-            "host":     st.secrets["DB_HOST"],
-            "port":     st.secrets["DB_PORT"],
-            "user":     st.secrets["DB_USER"],
-            "password": st.secrets["DB_PASSWORD"],
-            "dbname":   st.secrets["DB_NAME"],
-        }
+        host = st.secrets.get("DB_HOST", "")
+        if host and host != "localhost":
+            return {
+                "host":     host,
+                "port":     st.secrets.get("DB_PORT", "5432"),
+                "user":     st.secrets.get("DB_USER", "postgres"),
+                "password": st.secrets.get("DB_PASSWORD", ""),
+                "dbname":   st.secrets.get("DB_NAME", "postgres"),
+            }
     except Exception:
-        return {
-            "host":     os.getenv("DB_HOST", "localhost"),
-            "port":     os.getenv("DB_PORT", "5432"),
-            "user":     os.getenv("DB_USER", "postgres"),
-            "password": os.getenv("DB_PASSWORD", ""),
-            "dbname":   os.getenv("DB_NAME", "weatherstack_etl"),
-        }
+        pass  # st no disponible (ej: scripts de CLI), continúa
+
+    # Intento 2: variables de entorno / .env (desarrollo local)
+    host = os.getenv("DB_HOST", "localhost")
+    return {
+        "host":     host,
+        "port":     os.getenv("DB_PORT", "5432"),
+        "user":     os.getenv("DB_USER", "postgres"),
+        "password": os.getenv("DB_PASSWORD", ""),
+        "dbname":   os.getenv("DB_NAME", "weatherstack_etl"),
+    }
 
 _cfg = _get_db_config()
 DB_HOST     = _cfg["host"]

@@ -12,7 +12,7 @@ from sqlalchemy import func, and_
 import sys
 sys.path.insert(0, '.')
 
-from scripts.database import SessionLocal
+from scripts.database import SessionLocal, DB_HOST
 from scripts.models import Ciudad, RegistroClima
 
 # ── Configuración de página ────────────────────────────────────────────────────
@@ -44,6 +44,18 @@ st.markdown(
 )
 
 st.title("🎛️ Dashboard Interactivo — Control Total")
+
+# Verifica que las credenciales de BD estén configuradas
+if DB_HOST == "localhost":
+    st.error(
+        "🔐 **Base de datos no configurada.**\n\n"
+        "Para desplegar esta app en Streamlit Cloud, agrega los secrets de la BD:\n\n"
+        "1. Ve a tu app en share.streamlit.io\n"
+        "2. Menú ⋮ → **Settings → Secrets**\n"
+        "3. Pega el contenido de tu `.streamlit/secrets.toml`\n"
+        "4. Guarda y reinicia la app"
+    )
+    st.stop()
 
 db = SessionLocal()
 
