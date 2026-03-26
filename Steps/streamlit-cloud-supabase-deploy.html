@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Despliegue en Streamlit Cloud + Supabase | Minería de Datos | Ingeniería de Sistemas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #1e3c72;
+    --secondary-color: #2a5298;
+    --accent-color: #ff6b6b;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --border-color: #e0e0e0;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --code-bg: #2d2d2d;
+    --supabase-color: #3ecf8e;
+    --streamlit-color: #ff4b4b;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--dark-text);
+    background-color: #fff;
+}
+
+.main-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 0;
+}
+
+.top-bar {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    text-align: center;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.main-nav {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--accent-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.main-content {
+    padding: 50px 0;
+}
+
+section {
+    margin-bottom: 40px;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h2 {
+    color: var(--secondary-color);
+    font-size: 2em;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--accent-color);
+    padding-left: 15px;
+}
+
+h3 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+h4 {
+    color: var(--secondary-color);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 60%, #3ecf8e 100%);
+    color: white;
+    padding: 60px 40px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.hero-section h1 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.hero-section .lead {
+    font-size: 1.2em;
+    line-height: 1.8;
+}
+
+.lead {
+    font-size: 1.1em;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto 20px;
+}
+
+.divider {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 40px 0;
+}
+
+.divider-thick {
+    border: none;
+    border-top: 3px solid var(--accent-color);
+    margin: 50px 0;
+}
+
+.definition-box {
+    background-color: #e8f4f8;
+    border-left: 5px solid var(--secondary-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    font-size: 1.05em;
+}
+
+.reflection-box {
+    background-color: #fff3cd;
+    border-left: 5px solid var(--warning-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.reflection-box h4 {
+    color: #856404;
+    margin-bottom: 10px;
+}
+
+.reflection-box p,
+.reflection-box ul {
+    color: #856404;
+    line-height: 1.7;
+}
+
+.reflection-box ul {
+    margin-left: 20px;
+}
+
+.reflection-box li {
+    margin-bottom: 8px;
+}
+
+.success-box {
+    background-color: #d4edda;
+    border-left: 5px solid var(--success-color);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.success-box h4 {
+    color: #155724;
+    margin-bottom: 10px;
+}
+
+.success-box p, .success-box ul {
+    color: #155724;
+    line-height: 1.7;
+}
+
+.success-box ul {
+    margin-left: 20px;
+}
+
+.info-box {
+    background-color: #e7f3ff;
+    border-left: 5px solid #2a5298;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.info-box h4 {
+    color: #004085;
+    margin-bottom: 10px;
+}
+
+.info-box p, .info-box ul, .info-box ol {
+    color: #004085;
+    line-height: 1.7;
+}
+
+.info-box ul, .info-box ol {
+    margin-left: 20px;
+}
+
+.info-box li {
+    margin-bottom: 6px;
+}
+
+.card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin: 15px 0;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card h3, .card h4 {
+    color: var(--secondary-color);
+    margin-top: 0;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.cards-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+pre {
+    background-color: var(--code-bg);
+    color: #f8f8f2;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.95em;
+    line-height: 1.5;
+    border-left: 4px solid var(--accent-color);
+    position: relative;
+}
+
+code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--primary-color);
+}
+
+pre code {
+    background-color: transparent;
+    color: #f8f8f2;
+    padding: 0;
+}
+
+.step-box {
+    background-color: var(--light-bg);
+    border-left: 5px solid var(--secondary-color);
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.step-number {
+    display: inline-block;
+    background-color: var(--secondary-color);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.step-box h3 {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    margin: 30px 0;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.styled-table thead tr {
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: left;
+    font-weight: 500;
+}
+
+.styled-table th, .styled-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.styled-table tbody tr:hover {
+    background-color: var(--light-bg);
+}
+
+.styled-table tbody tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+ul, ol {
+    margin: 15px 0;
+    margin-left: 30px;
+}
+
+li {
+    margin: 8px 0;
+    line-height: 1.7;
+}
+
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin: 5px 5px 5px 0;
+}
+
+.badge-primary   { background-color: #e7f3ff; color: #004085; }
+.badge-success   { background-color: #d4edda; color: #155724; }
+.badge-warning   { background-color: #fff3cd; color: #856404; }
+.badge-danger    { background-color: #f8d7da; color: #721c24; }
+.badge-supabase  { background-color: #d4f5e9; color: #155724; }
+.badge-streamlit { background-color: #ffe0e0; color: #7c0000; }
+
+.feature-list {
+    list-style: none;
+    margin: 20px 0;
+}
+
+.feature-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.feature-list li:before {
+    content: "✓ ";
+    color: var(--success-color);
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Diagrama de arquitectura */
+.arch-diagram {
+    background: #1a1a2e;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 30px 0;
+    font-family: 'Courier New', monospace;
+    color: #e0e0e0;
+    font-size: 0.9em;
+    line-height: 1.8;
+    overflow-x: auto;
+}
+
+.arch-diagram .green  { color: #3ecf8e; font-weight: bold; }
+.arch-diagram .red    { color: #ff4b4b; font-weight: bold; }
+.arch-diagram .yellow { color: #ffd700; font-weight: bold; }
+.arch-diagram .blue   { color: #64b5f6; font-weight: bold; }
+.arch-diagram .white  { color: #ffffff; font-weight: bold; }
+
+/* Screenshot placeholder */
+.screenshot-placeholder {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+    border: 2px dashed #2a5298;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin: 20px 0;
+    color: #2a5298;
+}
+
+.screenshot-placeholder i {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+/* Checklist */
+.checklist {
+    list-style: none;
+    margin: 15px 0;
+    padding: 0;
+}
+
+.checklist li {
+    padding: 8px 0 8px 35px;
+    position: relative;
+    border-bottom: 1px dashed #e0e0e0;
+}
+
+.checklist li:before {
+    content: "☐";
+    position: absolute;
+    left: 5px;
+    color: #2a5298;
+    font-size: 1.2em;
+    line-height: 1.3;
+}
+
+/* Highlight inline */
+.highlight-green { color: #1a7a4a; font-weight: 600; }
+.highlight-red   { color: #c0392b; font-weight: 600; }
+.highlight-blue  { color: #2a5298; font-weight: 600; }
+
+.main-footer {
+    background: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 40px 0;
+    margin-top: 50px;
+}
+
+.main-footer p { margin: 8px 0; font-size: 0.95em; }
+
+.main-footer a {
+    color: #fff9e6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.main-footer a:hover { color: var(--accent-color); }
+
+#scrollTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 99;
+    transition: background-color 0.3s;
+}
+
+#scrollTopBtn:hover { background-color: var(--accent-color); }
+
+@media (max-width: 768px) {
+    h1 { font-size: 1.8em; }
+    h2 { font-size: 1.5em; }
+    .hero-section { padding: 40px 20px; }
+    .main-nav ul { flex-direction: column; }
+    .main-nav a { padding: 10px 15px; font-size: 13px; }
+    .cards-grid, .cards-grid-2 { grid-template-columns: 1fr; }
+    pre { font-size: 0.85em; padding: 15px; }
+    .brand-container { flex-direction: column; gap: 5px; }
+    .brand-name { font-size: 14px; }
+}
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="top-bar">
+            <div class="container">
+                <div class="brand-container">
+                    <img src="https://raw.githubusercontent.com/code-corhuila/material-mineria-datos/b3725d694125ab35294ddfe415a327bc1445d32c/01-week/01-session/LOGO%20CORHUILA%20BLANCO%20PNG%20(2).png" alt="Logo Corhuila" class="logo-img">
+                    <div>
+                        <div class="brand-name">CORHUILA - Corporación Universitaria de Huila</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Ingeniería de Sistemas | Minería de Datos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#introduccion" class="nav-link">Introducción</a></li>
+                <li><a href="#arquitectura" class="nav-link">Arquitectura</a></li>
+                <li><a href="#supabase" class="nav-link">Supabase</a></li>
+                <li><a href="#preparacion-codigo" class="nav-link">Preparación Código</a></li>
+                <li><a href="#github" class="nav-link">GitHub</a></li>
+                <li><a href="#streamlit-cloud" class="nav-link">Streamlit Cloud</a></li>
+                <li><a href="#verificacion" class="nav-link">Verificación</a></li>
+                <li><a href="#errores-comunes" class="nav-link">Errores Comunes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container main-content">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- HERO                                                           -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="introduccion" class="hero-section">
+            <h1>☁️ Despliegue en Streamlit Cloud + Supabase</h1>
+            <p class="lead">Publica tu dashboard ETL de clima en la nube de forma gratuita usando Streamlit Cloud como frontend y Supabase como base de datos PostgreSQL en la nube</p>
+            <p style="margin-top: 20px; font-size: 1em; opacity: 0.95;">
+                Al finalizar tendrás una URL pública compartible con cualquier persona, sin servidores propios, sin costos y con datos reales conectados desde Supabase
+            </p>
+            <div style="margin-top: 25px;">
+                <span class="badge badge-streamlit">Streamlit Cloud</span>
+                <span class="badge badge-supabase">Supabase PostgreSQL</span>
+                <span class="badge badge-primary">GitHub</span>
+                <span class="badge badge-success">Python 3.11</span>
+                <span class="badge badge-warning">SQLAlchemy 2.0</span>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 1 — ARQUITECTURA                                       -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="arquitectura">
+            <h2><i class="fas fa-project-diagram"></i> Fase 1: Arquitectura del Despliegue</h2>
+
+            <p>Antes de desplegar, es fundamental entender cómo interactúan los tres servicios en la nube. Ninguno corre en tu máquina local.</p>
+
+            <div class="arch-diagram">
+<pre style="background:transparent; border:none; color:inherit; padding:0; margin:0;">
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │                    FLUJO DE DESPLIEGUE COMPLETO                     │
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Tu Máquina (desarrollo)
+  ┌──────────────────┐
+  │  📁 Código       │──── git push ───▶ <span class="white">GitHub</span> (repositorio público)
+  │  scripts/        │                         │
+  │  dashboards      │                         │ Streamlit Cloud
+  └──────────────────┘                         │ lee el repositorio
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │  <span class="red">Streamlit Cloud</span>      │
+                                    │  ─────────────────   │
+                                    │  • Instala deps      │
+                                    │  • Python 3.11       │──▶ URL pública
+                                    │  • Lee st.secrets    │    https://xxx
+                                    │  • Ejecuta app       │    .streamlit.app
+                                    └──────────┬───────────┘
+                                               │
+                                     SQLAlchemy │ psycopg2
+                                     (pooler)   │ port 6543
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │  <span class="green">Supabase</span>             │
+                                    │  ─────────────────   │
+                                    │  • PostgreSQL 15     │
+                                    │  • Pooler IPv4       │
+                                    │  • 1000 registros    │
+                                    │  • SSL requerido     │
+                                    └──────────────────────┘
+</pre>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4><i class="fab fa-github" style="color:#333;"></i> GitHub</h4>
+                    <p>Repositorio de código fuente. Streamlit Cloud lee directamente de aquí. <strong>No sube credenciales</strong> — el <code>.gitignore</code> excluye <code>.env</code> y <code>secrets.toml</code>.</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-cloud" style="color:#ff4b4b;"></i> Streamlit Cloud</h4>
+                    <p>Ejecuta el dashboard Python en sus servidores. Recibe las credenciales de BD mediante <strong>Secrets</strong> (configurados en la UI, nunca en el código).</p>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-database" style="color:#3ecf8e;"></i> Supabase</h4>
+                    <p>Base de datos PostgreSQL en la nube. Acepta conexiones remotas desde Streamlit Cloud vía el <strong>connection pooler</strong> en el puerto 6543.</p>
+                </div>
+            </div>
+
+            <div class="definition-box">
+                <h4>🔑 ¿Por qué se usa el Connection Pooler de Supabase?</h4>
+                <p>El host directo de Supabase (<code>db.xxx.supabase.co:5432</code>) expone solo IPv6. Streamlit Cloud utiliza IPv4 exclusivamente. El <strong>pooler de transacciones</strong> (<code>aws-1-us-east-2.pooler.supabase.com:6543</code>) resuelve esto al exponer un endpoint IPv4, además de gestionar el pool de conexiones automáticamente — ideal para entornos serverless.</p>
+            </div>
+
+            <div class="reflection-box">
+                <h4>⚠️ Prerequisitos antes de comenzar</h4>
+                <ul>
+                    <li>Cuenta gratuita en <strong>GitHub</strong> — <a href="https://github.com" target="_blank">github.com</a></li>
+                    <li>Cuenta gratuita en <strong>Supabase</strong> — <a href="https://supabase.com" target="_blank">supabase.com</a></li>
+                    <li>Cuenta gratuita en <strong>Streamlit Cloud</strong> — <a href="https://share.streamlit.io" target="_blank">share.streamlit.io</a> (se registra con GitHub)</li>
+                    <li>Pipeline ETL funcionando localmente con datos cargados en Supabase</li>
+                    <li>Python 3.11 configurado en el entorno local (recomendado para coincidir con producción)</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 2 — SUPABASE                                          -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="supabase">
+            <h2><i class="fas fa-database"></i> Fase 2: Configurar Supabase</h2>
+
+            <p>Supabase provee PostgreSQL gestionado en la nube con capa gratuita generosa (500 MB de base de datos, conexiones ilimitadas vía pooler).</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Crear Proyecto en Supabase</h3>
+                <ol>
+                    <li>Ve a <a href="https://supabase.com" target="_blank">supabase.com</a> → <strong>Start your project</strong></li>
+                    <li>Inicia sesión con GitHub (recomendado) o con email</li>
+                    <li>Clic en <strong>New Project</strong></li>
+                    <li>Completa el formulario:
+                        <ul>
+                            <li><strong>Name:</strong> <code>etlweatherstack</code></li>
+                            <li><strong>Database Password:</strong> elige una contraseña segura y <span class="highlight-red">guárdala</span> — la necesitarás después</li>
+                            <li><strong>Region:</strong> <code>East US (North Virginia)</code> — más cercana a los servidores de Streamlit Cloud en AWS</li>
+                        </ul>
+                    </li>
+                    <li>Clic en <strong>Create new project</strong> — espera ~2 minutos</li>
+                </ol>
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-image"></i>
+                    <strong>Pantalla: Supabase New Project</strong><br>
+                    Completa Name, Database Password y Region antes de crear
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Obtener las Credenciales de Conexión</h3>
+                <p>Una vez creado el proyecto, ve a <strong>Project Settings → Database</strong>:</p>
+                <ol>
+                    <li>En el panel izquierdo, clic en el ícono de engranaje ⚙️ → <strong>Database</strong></li>
+                    <li>Desplázate hacia abajo hasta la sección <strong>Connection pooling</strong></li>
+                    <li>Asegúrate de seleccionar <strong>Mode: Transaction</strong></li>
+                    <li>Copia los valores — los necesitarás para el <code>secrets.toml</code>:
+                    </li>
+                </ol>
+
+                <div class="table-responsive" style="margin-top: 15px;">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Campo en Supabase</th>
+                                <th>Variable en secrets.toml</th>
+                                <th>Ejemplo de valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Host</strong> (pooler)</td>
+                                <td><code>DB_HOST</code></td>
+                                <td><code>aws-1-us-east-2.pooler.supabase.com</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Port</strong> (pooler)</td>
+                                <td><code>DB_PORT</code></td>
+                                <td><code>6543</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>User</strong> (pooler)</td>
+                                <td><code>DB_USER</code></td>
+                                <td><code>postgres.abcdefghijklmn</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Password</strong></td>
+                                <td><code>DB_PASSWORD</code></td>
+                                <td><code>tu_contraseña_segura</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Database</strong></td>
+                                <td><code>DB_NAME</code></td>
+                                <td><code>postgres</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="reflection-box" style="margin-top: 15px;">
+                    <h4>⚠️ Contraseña con caracteres especiales</h4>
+                    <p>Si tu contraseña contiene <code>@</code>, <code>#</code>, <code>%</code> u otros caracteres especiales, el código usa <code>quote_plus()</code> de <code>urllib.parse</code> para codificarlos correctamente en la URL de conexión. Esto ya está implementado en <code>scripts/database.py</code>. No necesitas modificar la contraseña.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Verificar Datos en Supabase</h3>
+                <p>Antes de desplegar, confirma que los datos ya están cargados en Supabase:</p>
+                <ol>
+                    <li>En el panel de Supabase, ve a <strong>Table Editor</strong></li>
+                    <li>Deberías ver las tablas: <code>ciudades</code>, <code>registros_clima</code>, <code>metricas_etl</code></li>
+                    <li>Verifica que <code>registros_clima</code> tenga registros (al menos 1000)</li>
+                </ol>
+                <p style="margin-top: 15px;">Si las tablas no existen aún, ejecuta en tu entorno local:</p>
+                <pre><code># Crea las tablas en Supabase
+python scripts/test_db.py
+
+# Genera datos sintéticos
+python scripts/demo_data.py
+python scripts/transformador.py
+
+# Carga los datos (bulk insert ~5 segundos)
+python scripts/extractor_db.py</code></pre>
+
+                <div class="success-box">
+                    <h4>✅ Supabase listo</h4>
+                    <p>Tienes las credenciales del pooler y los datos cargados. El próximo paso es preparar el código para el despliegue.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 3 — PREPARACIÓN DEL CÓDIGO                            -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="preparacion-codigo">
+            <h2><i class="fas fa-code"></i> Fase 3: Preparación del Código</h2>
+
+            <p>Streamlit Cloud necesita tres archivos clave para funcionar correctamente: <code>requirements.txt</code>, <code>.streamlit/config.toml</code> y el archivo Python del dashboard.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Verificar requirements.txt</h3>
+                <p>Streamlit Cloud instala exactamente las versiones especificadas. Usa versiones exactas (<code>==</code>) para garantizar reproducibilidad:</p>
+                <pre><code>requests==2.33.0
+pandas==2.3.3
+python-dotenv==1.2.2
+matplotlib==3.10.8
+openpyxl==3.1.5
+psycopg2-binary==2.9.11
+SQLAlchemy==2.0.48
+alembic==1.18.4
+streamlit==1.55.0
+plotly==6.6.0
+numpy==2.4.3</code></pre>
+                <div class="info-box">
+                    <h4>📌 Por qué versiones exactas</h4>
+                    <p>Usar <code>>=</code> puede instalar versiones más nuevas con cambios incompatibles. Con <code>==</code> garantizas que lo que funciona en local funciona en producción. Obtienes las versiones exactas con:</p>
+                    <pre><code>pip freeze | grep -E "^(streamlit|plotly|pandas|sqlalchemy|psycopg2|requests)="</code></pre>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Verificar .streamlit/config.toml</h3>
+                <p>Este archivo configura el comportamiento de Streamlit en producción. Debe existir en la raíz del proyecto:</p>
+                <pre><code>[server]
+headless = true
+port = 8501
+enableCORS = false
+
+[theme]
+primaryColor = "#2a5298"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#2c3e50"
+font = "sans serif"</code></pre>
+                <p style="margin-top: 10px;">El parámetro <strong><code>headless = true</code></strong> es obligatorio en producción — indica que no hay navegador local disponible para abrir automáticamente.</p>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Verificar scripts/database.py — Lectura de Secrets</h3>
+                <p>El módulo de conexión debe leer credenciales desde <code>st.secrets</code> (Streamlit Cloud) y caer a <code>.env</code> solo en local. La lógica correcta:</p>
+                <pre><code>def _get_db_config():
+    # Intento 1: st.secrets (disponible en Streamlit Cloud)
+    try:
+        import streamlit as st
+        host = st.secrets.get("DB_HOST", "")
+        if host and host != "localhost":
+            return {
+                "host":     host,
+                "port":     st.secrets.get("DB_PORT", "5432"),
+                "user":     st.secrets.get("DB_USER", "postgres"),
+                "password": st.secrets.get("DB_PASSWORD", ""),
+                "dbname":   st.secrets.get("DB_NAME", "postgres"),
+            }
+    except Exception:
+        pass  # st no disponible (scripts CLI locales)
+
+    # Intento 2: variables de entorno / .env (desarrollo local)
+    host = os.getenv("DB_HOST", "localhost")
+    return {
+        "host":     host,
+        "port":     os.getenv("DB_PORT", "5432"),
+        "user":     os.getenv("DB_USER", "postgres"),
+        "password": os.getenv("DB_PASSWORD", ""),
+        "dbname":   os.getenv("DB_NAME", "weatherstack_etl"),
+    }</code></pre>
+
+                <div class="reflection-box">
+                    <h4>⚠️ Error común: fallback silencioso a localhost</h4>
+                    <p>Si usas <code>st.secrets["DB_HOST"]</code> con corchetes y la clave no existe, lanza <code>KeyError</code>. El <code>except Exception</code> lo captura silenciosamente y cae a <code>localhost</code>, generando el error: <em>"Connection refused to 127.0.0.1:5432"</em>. Siempre usa <code>st.secrets.get("DB_HOST", "")</code> y verifica que el valor no sea <code>localhost</code>.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Verificar .gitignore</h3>
+                <p>Es crítico que las credenciales NUNCA lleguen al repositorio de GitHub. Verifica que tu <code>.gitignore</code> incluya:</p>
+                <pre><code># Entorno virtual
+venv/
+*.pyc
+__pycache__/
+
+# Variables de entorno — NUNCA commitear
+.env
+.env.local
+
+# Credenciales de Streamlit — NUNCA commitear
+.streamlit/secrets.toml
+
+# Datos locales (pesados, no necesarios en producción)
+data/
+logs/</code></pre>
+
+                <div class="success-box">
+                    <h4>✅ Regla de oro de seguridad</h4>
+                    <p>Las credenciales van en <strong>dos lugares únicamente</strong>: en tu <code>.env</code> local (para desarrollo) y en <strong>Streamlit Cloud Secrets</strong> (para producción). Nunca en el código ni en el repositorio.</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">5</span>Estructura Final del Proyecto</h3>
+                <p>Esta es la estructura que Streamlit Cloud espera encontrar en el repositorio:</p>
+                <pre><code>etlweatherstack/                    ← raíz del repositorio
+│
+├── dashboard_interactive.py        ⭐ archivo principal del dashboard
+├── dashboard_advanced.py           (opcional: segunda app)
+├── dashboard_app.py                (opcional: tercera app)
+│
+├── scripts/
+│   ├── __init__.py                 ⭐ necesario para importaciones
+│   ├── database.py                 ⭐ conexión SQLAlchemy + st.secrets
+│   ├── models.py                   ⭐ modelos ORM (Ciudad, RegistroClima)
+│   ├── extractor_db.py             (solo se ejecuta local)
+│   ├── demo_data.py                (solo se ejecuta local)
+│   └── transformador.py            (solo se ejecuta local)
+│
+├── .streamlit/
+│   ├── config.toml                 ⭐ tema y configuración (se commitea)
+│   └── secrets.toml                ✗ NO se commitea (.gitignore)
+│
+├── requirements.txt                ⭐ dependencias con versiones exactas
+├── .gitignore                      ⭐ excluye .env y secrets.toml
+└── README.md</code></pre>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 4 — GITHUB                                            -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="github">
+            <h2><i class="fab fa-github"></i> Fase 4: Subir Código a GitHub</h2>
+
+            <p>Streamlit Cloud lee el código directamente de un repositorio de GitHub. El repositorio puede ser público o privado.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Inicializar el Repositorio Git</h3>
+                <pre><code># Desde la raíz del proyecto
+cd ~/etlweatherstack
+
+# Inicializa git
+git init
+git branch -m main
+
+# Configura tu identidad (si no lo has hecho)
+git config user.name "Tu Nombre"
+git config user.email "tu@email.com"</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Agregar Archivos y Hacer el Primer Commit</h3>
+                <pre><code># Agrega todos los archivos (respetando .gitignore)
+git add .
+
+# Verifica qué archivos se van a subir
+# ⚠️ Confirma que NO aparecen .env ni secrets.toml
+git status --short
+
+# Crea el commit inicial
+git commit -m "feat: ETL pipeline + Streamlit dashboards con Supabase"</code></pre>
+
+                <div class="reflection-box">
+                    <h4>⚠️ Antes de hacer commit — revisión de seguridad</h4>
+                    <p>Ejecuta <code>git status --short</code> y asegúrate de que estos archivos <strong>NO</strong> aparecen en la lista:</p>
+                    <ul>
+                        <li><code>.env</code></li>
+                        <li><code>.streamlit/secrets.toml</code></li>
+                        <li>Cualquier archivo con contraseñas o API keys</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Instalar GitHub CLI y Autenticarse</h3>
+                <p>El GitHub CLI (<code>gh</code>) permite crear el repositorio y hacer push en un solo comando:</p>
+                <pre><code># En Ubuntu/WSL
+sudo apt install gh -y
+
+# Autenticarse (abre el navegador)
+gh auth login --web --git-protocol https
+
+# Si el navegador no abre automáticamente (WSL),
+# copia el código de un tiempo y pégalo en:
+# https://github.com/login/device</code></pre>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Crear Repositorio en GitHub y Hacer Push</h3>
+                <pre><code># Crea el repositorio en GitHub y sube el código en un paso
+gh repo create etlweatherstack \
+    --public \
+    --description "Pipeline ETL de datos climáticos con Streamlit + Supabase" \
+    --source=. \
+    --remote=origin \
+    --push</code></pre>
+
+                <p style="margin-top: 15px;">Una vez completado verás la URL del repositorio, ejemplo:</p>
+                <pre><code>✓ Created repository tunombre/etlweatherstack on GitHub
+  https://github.com/tunombre/etlweatherstack
+✓ Pushed commits to https://github.com/tunombre/etlweatherstack.git</code></pre>
+
+                <div class="info-box">
+                    <h4>📌 Para actualizaciones futuras</h4>
+                    <p>Cada vez que hagas cambios en el código y quieras que Streamlit Cloud los despliegue automáticamente:</p>
+                    <pre><code>git add .
+git commit -m "descripción del cambio"
+git push origin main</code></pre>
+                    <p>Streamlit Cloud detecta el push y redespliega la app en ~30 segundos.</p>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Repositorio en GitHub listo</h4>
+                <p>El código está en GitHub sin credenciales. El siguiente paso es conectar Streamlit Cloud al repositorio y configurar los secrets.</p>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 5 — STREAMLIT CLOUD                                   -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="streamlit-cloud">
+            <h2><i class="fas fa-cloud-upload-alt"></i> Fase 5: Desplegar en Streamlit Cloud</h2>
+
+            <p>Streamlit Cloud es el servicio oficial de hosting gratuito para apps Streamlit. Se conecta directamente a GitHub y redespliega automáticamente con cada push.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Crear Cuenta en Streamlit Cloud</h3>
+                <ol>
+                    <li>Ve a <a href="https://share.streamlit.io" target="_blank">share.streamlit.io</a></li>
+                    <li>Clic en <strong>Sign up</strong> → <strong>Continue with GitHub</strong></li>
+                    <li>Autoriza la app de Streamlit en tu cuenta de GitHub</li>
+                    <li>Completa el perfil si es la primera vez</li>
+                </ol>
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-image"></i>
+                    <strong>Pantalla: share.streamlit.io</strong><br>
+                    Dashboard de Streamlit Cloud — verás "New app" en la esquina superior derecha
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Crear la App</h3>
+                <ol>
+                    <li>Clic en <strong>New app</strong> (botón azul superior derecho)</li>
+                    <li>Selecciona <strong>From existing repo</strong></li>
+                    <li>Completa los campos:
+                        <div class="table-responsive" style="margin-top: 15px;">
+                            <table class="styled-table">
+                                <thead>
+                                    <tr><th>Campo</th><th>Valor</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>Repository</strong></td><td><code>tunombre/etlweatherstack</code></td></tr>
+                                    <tr><td><strong>Branch</strong></td><td><code>main</code></td></tr>
+                                    <tr><td><strong>Main file path</strong></td><td><code>dashboard_interactive.py</code></td></tr>
+                                    <tr><td><strong>App URL</strong> (opcional)</td><td><code>etl-clima-corhuila</code> (personalizable)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </li>
+                </ol>
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-image"></i>
+                    <strong>Pantalla: New App — Deploy from GitHub</strong><br>
+                    Selecciona el repositorio, rama main y el archivo dashboard_interactive.py
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Configurar Python 3.11 — Paso crítico de rendimiento</h3>
+                <p>Antes de hacer clic en Deploy, configura la versión de Python. Streamlit Cloud por defecto usa Python 3.9 — Python 3.11 es significativamente más rápido (hasta 60% en benchmarks de CPython).</p>
+
+                <p style="margin-top: 15px;"><strong>Opción A — Desde la UI (recomendado):</strong></p>
+                <ol>
+                    <li>En la pantalla de "Deploy", clic en <strong>Advanced settings</strong></li>
+                    <li>En el campo <strong>Python version</strong>, selecciona <code>3.11</code></li>
+                </ol>
+
+                <p style="margin-top: 15px;"><strong>Opción B — Archivo en el repositorio (permanente y reproducible):</strong></p>
+                <p>Crea el archivo <code>.python-version</code> en la raíz del proyecto:</p>
+                <pre><code>3.11</code></pre>
+                <p style="margin-top: 10px;">Agrega y commitea:</p>
+                <pre><code>echo "3.11" > .python-version
+git add .python-version
+git commit -m "config: fija Python 3.11 para Streamlit Cloud"
+git push origin main</code></pre>
+
+                <div class="info-box">
+                    <h4>📌 ¿Por qué Python 3.11?</h4>
+                    <ul>
+                        <li><strong>Rendimiento:</strong> CPython 3.11 es ~10-60% más rápido que 3.9/3.10 gracias al proyecto "Faster CPython"</li>
+                        <li><strong>Pandas 2.x:</strong> pandas 2.3 requiere Python 3.9+ y aprovecha mejor Python 3.11</li>
+                        <li><strong>SQLAlchemy 2.0:</strong> funciona óptimamente en 3.11</li>
+                        <li><strong>Consistencia:</strong> si tu entorno local usa 3.11, producción tiene el mismo comportamiento</li>
+                    </ul>
+                </div>
+
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-image"></i>
+                    <strong>Pantalla: Advanced settings</strong><br>
+                    Python version → selecciona 3.11 antes de hacer Deploy
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">4</span>Configurar los Secrets de Base de Datos</h3>
+                <p>Este es el paso más importante. Los secrets reemplazan al <code>.env</code> en producción. Sin ellos, la app intenta conectar a <code>localhost</code> y falla.</p>
+
+                <p style="margin-top: 15px;"><strong>Durante el deploy inicial:</strong></p>
+                <ol>
+                    <li>En <strong>Advanced settings</strong> (antes de hacer Deploy), busca la sección <strong>Secrets</strong></li>
+                    <li>En el campo de texto, pega exactamente esto con tus credenciales reales:</li>
+                </ol>
+                <pre><code>DB_HOST = "aws-1-us-east-2.pooler.supabase.com"
+DB_PORT = "6543"
+DB_USER = "postgres.tu_project_ref_aqui"
+DB_PASSWORD = "tu_password_de_supabase"
+DB_NAME = "postgres"</code></pre>
+
+                <p style="margin-top: 15px;"><strong>Si la app ya está desplegada (agregar secrets después):</strong></p>
+                <ol>
+                    <li>En el dashboard de Streamlit Cloud, encuentra tu app</li>
+                    <li>Clic en el menú <strong>⋮</strong> (tres puntos verticales) de la app</li>
+                    <li>Selecciona <strong>Settings</strong></li>
+                    <li>Ve a la pestaña <strong>Secrets</strong></li>
+                    <li>Pega el mismo bloque de secrets</li>
+                    <li>Clic en <strong>Save</strong> — la app se reinicia automáticamente</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-image"></i>
+                    <strong>Pantalla: Secrets Editor</strong><br>
+                    Pega las credenciales en formato TOML — DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+                </div>
+
+                <div class="reflection-box">
+                    <h4>⚠️ Formato TOML obligatorio</h4>
+                    <p>Los secrets deben estar en formato TOML (igual que el archivo <code>secrets.toml</code>). Las claves son strings, van entre comillas dobles. Usar comillas simples o formato JSON causará errores de parseo.</p>
+                    <p style="margin-top: 10px;"><span class="highlight-green">✓ Correcto:</span> <code>DB_PORT = "6543"</code><br>
+                    <span class="highlight-red">✗ Incorrecto:</span> <code>DB_PORT = 6543</code> (sin comillas)</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">5</span>Lanzar el Deploy</h3>
+                <ol>
+                    <li>Clic en el botón <strong>Deploy!</strong></li>
+                    <li>Streamlit Cloud comienza a instalar dependencias — observa el log en tiempo real</li>
+                    <li>El proceso típico toma entre <strong>2 y 5 minutos</strong>:
+                        <ul>
+                            <li><em>Cloning repository...</em></li>
+                            <li><em>Installing requirements...</em> (la parte más larga)</li>
+                            <li><em>Starting app...</em></li>
+                        </ul>
+                    </li>
+                    <li>Al finalizar, la app abre automáticamente en la URL asignada</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    <i class="fas fa-image"></i>
+                    <strong>Pantalla: Deploy Log</strong><br>
+                    Verás el log de instalación en tiempo real — espera hasta "Your app is live!"
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ App desplegada</h4>
+                <p>Tu dashboard ya tiene una URL pública del tipo <code>https://tunombre-etlweatherstack-xxx.streamlit.app</code>. Cualquier persona con el link puede acceder sin necesidad de Python ni configuración local.</p>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 6 — VERIFICACIÓN                                      -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="verificacion">
+            <h2><i class="fas fa-check-double"></i> Fase 6: Verificar el Despliegue</h2>
+
+            <p>Una vez que la app esté live, valida que todo funciona correctamente siguiendo estos puntos de verificación.</p>
+
+            <div class="step-box">
+                <h3><span class="step-number">1</span>Checklist de Verificación Post-Deploy</h3>
+                <ul class="checklist">
+                    <li>La URL pública carga el dashboard sin errores de pantalla blanca</li>
+                    <li>El sidebar muestra las 5 ciudades: Bogotá, Medellín, Cali, Barranquilla, Cartagena</li>
+                    <li>Los KPIs (temperatura promedio, humedad, etc.) muestran valores numéricos reales</li>
+                    <li>Los gráficos (boxplot, línea temporal, scatter) se renderizan correctamente</li>
+                    <li>El filtro por fechas y temperaturas actualiza los gráficos dinámicamente</li>
+                    <li>El botón "Descargar CSV" genera un archivo con datos</li>
+                    <li>No aparece ningún mensaje de error rojo en la pantalla</li>
+                    <li>En el menú ⋮ → <strong>Manage app</strong> → <strong>Logs</strong>, no hay errores <code>OperationalError</code></li>
+                </ul>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">2</span>Verificar los Logs de la App</h3>
+                <p>Para ver los logs en tiempo real desde el dashboard de Streamlit Cloud:</p>
+                <ol>
+                    <li>Esquina inferior derecha de tu app → clic en <strong>Manage app</strong></li>
+                    <li>O desde el dashboard → menú <strong>⋮</strong> → <strong>View app logs</strong></li>
+                </ol>
+                <p style="margin-top: 10px;">Lo que deberías ver en los logs si todo funciona:</p>
+                <pre><code># Logs esperados al arrancar correctamente:
+INFO  - Connecting to aws-1-us-east-2.pooler.supabase.com:6543
+INFO  - ✅ Conexión establecida correctamente
+INFO  - Cargando 1000 registros de clima...
+INFO  - Dashboard listo</code></pre>
+
+                <div class="reflection-box">
+                    <h4>⚠️ Log de error común — y su solución</h4>
+                    <pre><code>OperationalError: connection to server at "localhost" (127.0.0.1), port 5432 failed</code></pre>
+                    <p><strong>Causa:</strong> Los secrets no están configurados o <code>DB_HOST</code> no se está leyendo correctamente.</p>
+                    <p><strong>Solución:</strong></p>
+                    <ol>
+                        <li>Ve a Settings → Secrets de tu app</li>
+                        <li>Verifica que <code>DB_HOST</code> tiene el valor del pooler de Supabase (no localhost)</li>
+                        <li>Guarda y espera el reinicio automático</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <h3><span class="step-number">3</span>Actualizar la App (Flujo Continuo)</h3>
+                <p>Para cualquier cambio en el código, el flujo de actualización es:</p>
+                <pre><code># 1. Modifica el código localmente
+# 2. Prueba en local:
+streamlit run dashboard_interactive.py
+
+# 3. Commitea y sube a GitHub:
+git add .
+git commit -m "fix: descripción del cambio"
+git push origin main
+
+# Streamlit Cloud detecta el push y redespliega automáticamente en ~30s</code></pre>
+
+                <div class="info-box">
+                    <h4>📌 Reboot manual de la app</h4>
+                    <p>Si necesitas forzar un reinicio de la app sin cambios de código (por ejemplo, para limpiar caché de sesión): en el dashboard de Streamlit Cloud → menú <strong>⋮</strong> → <strong>Reboot app</strong>.</p>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ Verificación completa</h4>
+                <ul>
+                    <li>Dashboard accesible desde cualquier dispositivo con el link</li>
+                    <li>Datos reales de Supabase visualizados en tiempo real</li>
+                    <li>Actualizaciones automáticas con cada git push</li>
+                    <li>Python 3.11 para máximo rendimiento</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- SECCIÓN 7 — ERRORES COMUNES                                   -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="errores-comunes">
+            <h2><i class="fas fa-bug"></i> Fase 7: Errores Comunes y Soluciones</h2>
+
+            <p>Referencia rápida de los errores más frecuentes en despliegues de Streamlit Cloud con Supabase y cómo resolverlos.</p>
+
+            <div class="card">
+                <h4>🔴 Error 1 — Connection refused a localhost:5432</h4>
+                <pre><code>OperationalError: connection to server at "localhost" (127.0.0.1), port 5432 failed:
+Connection refused</code></pre>
+                <p><strong>Causa:</strong> Los secrets no están configurados, están vacíos, o <code>DB_HOST</code> tiene el valor <code>localhost</code>.</p>
+                <p><strong>Solución:</strong></p>
+                <ol>
+                    <li>Settings → Secrets → verifica que <code>DB_HOST</code> apunta al pooler de Supabase</li>
+                    <li>Verifica que el código usa <code>st.secrets.get()</code> en lugar de <code>st.secrets[]</code></li>
+                    <li>El código debe verificar: <code>if host and host != "localhost":</code></li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4>🔴 Error 2 — ModuleNotFoundError: No module named 'scripts'</h4>
+                <pre><code>ModuleNotFoundError: No module named 'scripts'</code></pre>
+                <p><strong>Causa:</strong> Falta el archivo <code>scripts/__init__.py</code> en el repositorio.</p>
+                <p><strong>Solución:</strong></p>
+                <pre><code># Crea el __init__.py vacío
+touch scripts/__init__.py
+git add scripts/__init__.py
+git commit -m "fix: agrega __init__.py a scripts/"
+git push origin main</code></pre>
+            </div>
+
+            <div class="card">
+                <h4>🔴 Error 3 — SSL connection required</h4>
+                <pre><code>OperationalError: SSL connection has been closed unexpectedly
+# o
+SSL SYSCALL error: EOF detected</code></pre>
+                <p><strong>Causa:</strong> Supabase requiere SSL obligatorio. La URL de conexión no incluye <code>?sslmode=require</code>.</p>
+                <p><strong>Solución:</strong> Verifica que <code>database.py</code> construye la URL así:</p>
+                <pre><code>DATABASE_URL = (
+    f"postgresql://{quote_plus(DB_USER)}:{quote_plus(DB_PASSWORD)}"
+    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require"
+)</code></pre>
+            </div>
+
+            <div class="card">
+                <h4>🔴 Error 4 — Contraseña con @ rompe la URL</h4>
+                <pre><code>OperationalError: invalid URL
+# o conexión a host incorrecto por el @ en la contraseña</code></pre>
+                <p><strong>Causa:</strong> El carácter <code>@</code> en la contraseña rompe el parsing de la URL de conexión de PostgreSQL.</p>
+                <p><strong>Solución:</strong> Siempre usa <code>quote_plus</code> para user y password:</p>
+                <pre><code>from urllib.parse import quote_plus
+
+DATABASE_URL = (
+    f"postgresql://{quote_plus(DB_USER)}:{quote_plus(DB_PASSWORD)}"
+    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require"
+)</code></pre>
+            </div>
+
+            <div class="card">
+                <h4>🔴 Error 5 — App se despliega pero queda en "Connecting..."</h4>
+                <pre><code># La app carga el spinner pero nunca muestra datos</code></pre>
+                <p><strong>Causa:</strong> El host de Supabase configurado es el directo (<code>db.xxx.supabase.co:5432</code>), que solo responde por IPv6. Streamlit Cloud solo tiene IPv4.</p>
+                <p><strong>Solución:</strong> Usa el <strong>connection pooler</strong> (transaction mode, puerto 6543):</p>
+                <pre><code># ✗ Host directo (solo IPv6 — NO funciona en Streamlit Cloud)
+DB_HOST = "db.abcdefgh.supabase.co"
+DB_PORT = "5432"
+
+# ✓ Pooler de transacciones (IPv4 — SÍ funciona)
+DB_HOST = "aws-1-us-east-2.pooler.supabase.com"
+DB_PORT = "6543"
+DB_USER = "postgres.tu_project_ref"  # nota el prefijo postgres.</code></pre>
+            </div>
+
+            <div class="card">
+                <h4>🟡 Error 6 — Versión de dependencia incompatible</h4>
+                <pre><code>ERROR: Could not find a version that satisfies the requirement pandas==3.0.0</code></pre>
+                <p><strong>Causa:</strong> Python 3.9 (versión por defecto de Streamlit Cloud) no soporta versiones recientes de pandas/numpy.</p>
+                <p><strong>Solución:</strong> Configura Python 3.11 en Advanced settings (como se describe en la Fase 5, paso 3) y usa versiones compatibles en <code>requirements.txt</code>.</p>
+            </div>
+
+            <div class="card">
+                <h4>🟡 Error 7 — Too many connections (Supabase)</h4>
+                <pre><code>OperationalError: FATAL: too many connections for role "postgres.xxx"</code></pre>
+                <p><strong>Causa:</strong> En el plan gratuito de Supabase, el pooler en modo <em>session</em> limita conexiones simultáneas.</p>
+                <p><strong>Solución:</strong> Usa el pooler en modo <strong>Transaction</strong> (puerto 6543). Agrega también <code>pool_pre_ping=True</code> al engine para reciclar conexiones muertas:</p>
+                <pre><code>engine = create_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True,
+    connect_args=connect_args
+)</code></pre>
+            </div>
+
+            <!-- Tabla resumen -->
+            <div class="table-responsive">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Error</th>
+                            <th>Causa</th>
+                            <th>Solución rápida</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Connection refused a localhost</td>
+                            <td>Secrets no configurados</td>
+                            <td>Settings → Secrets → agrega DB_HOST del pooler</td>
+                        </tr>
+                        <tr>
+                            <td>ModuleNotFoundError: scripts</td>
+                            <td>Falta <code>__init__.py</code></td>
+                            <td><code>touch scripts/__init__.py</code> + push</td>
+                        </tr>
+                        <tr>
+                            <td>SSL error</td>
+                            <td>Falta <code>?sslmode=require</code></td>
+                            <td>Agrega el parámetro SSL a la DATABASE_URL</td>
+                        </tr>
+                        <tr>
+                            <td>URL inválida con @</td>
+                            <td>Caracteres especiales en password</td>
+                            <td>Usa <code>quote_plus(DB_PASSWORD)</code></td>
+                        </tr>
+                        <tr>
+                            <td>App queda en "Connecting..."</td>
+                            <td>Host directo (IPv6 only)</td>
+                            <td>Usa pooler puerto 6543 con prefijo postgres.</td>
+                        </tr>
+                        <tr>
+                            <td>Too many connections</td>
+                            <td>Modo session en pooler</td>
+                            <td>Usa Transaction mode (puerto 6543) + pool_pre_ping</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <hr class="divider">
+
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <!-- RESUMEN FINAL                                                  -->
+        <!-- ══════════════════════════════════════════════════════════════ -->
+        <section id="resumen">
+            <h2><i class="fas fa-flag-checkered"></i> Resumen del Despliegue</h2>
+
+            <p>Completaste el despliegue completo de un pipeline ETL con dashboard en la nube. Esta es la arquitectura final:</p>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <h4>☁️ Streamlit Cloud</h4>
+                    <ul class="feature-list">
+                        <li>Dashboard accesible públicamente</li>
+                        <li>Python 3.11 para rendimiento óptimo</li>
+                        <li>Redeploy automático con cada git push</li>
+                        <li>Secrets gestionados de forma segura</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🗄️ Supabase</h4>
+                    <ul class="feature-list">
+                        <li>PostgreSQL 15 en la nube</li>
+                        <li>Pooler Transaction (IPv4, puerto 6543)</li>
+                        <li>SSL requerido activado</li>
+                        <li>1000 registros de clima disponibles</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>🔐 Seguridad</h4>
+                    <ul class="feature-list">
+                        <li>.env y secrets.toml en .gitignore</li>
+                        <li>Credenciales solo en Streamlit Secrets</li>
+                        <li>quote_plus para contraseñas especiales</li>
+                        <li>sslmode=require en la conexión</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="definition-box">
+                <h4>📋 Comandos clave del flujo completo</h4>
+                <pre><code># ── PRIMERA VEZ ───────────────────────────────────────────────────────
+# 1. Cargar datos en Supabase
+python scripts/demo_data.py && python scripts/transformador.py
+python scripts/extractor_db.py
+
+# 2. Subir código a GitHub
+git init && git branch -m main && git add .
+git commit -m "feat: ETL pipeline"
+gh repo create etlweatherstack --public --source=. --remote=origin --push
+
+# 3. Desplegar en Streamlit Cloud (manual en share.streamlit.io)
+#    → Seleccionar repo, branch main, archivo dashboard_interactive.py
+#    → Advanced settings → Python 3.11
+#    → Secrets → pegar credenciales Supabase
+#    → Deploy!
+
+# ── ACTUALIZAR LA APP ─────────────────────────────────────────────────
+git add . && git commit -m "update: descripción" && git push origin main
+# Streamlit Cloud redespliega automáticamente en ~30s
+
+# ── CON DATOS REALES (cuando renueve la cuota de Weatherstack) ────────
+python scripts/extractor.py      # extrae de la API real
+python scripts/transformador.py  # transforma
+python scripts/extractor_db.py   # carga en Supabase
+# El dashboard se actualiza sin tocar el código</code></pre>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p><strong>Corporación Universitaria de Huila (CORHUILA)</strong></p>
+            <p>Ingeniería de Sistemas | Minería de Datos 2026</p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
+                Material Educativo - Uso Académico Autorizado |
+                <a href="https://www.corhuila.edu.co" target="_blank">www.corhuila.edu.co</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.95;">
+                📚 Desarrollado por: <strong>Ing. Julian Quimbayo Castro</strong>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.85em;">
+                © 2026 Todos los derechos reservados
+            </p>
+        </div>
+    </footer>
+
+    <button id="scrollTopBtn" title="Volver arriba">↑</button>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupScrollButton();
+    setupNavigation();
+    setupSmoothScroll();
+    highlightActiveSection();
+});
+
+function setupScrollButton() {
+    const scrollBtn = document.getElementById('scrollTopBtn');
+
+    window.addEventListener('scroll', function() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            scrollBtn.style.display = 'block';
+        } else {
+            scrollBtn.style.display = 'none';
+        }
+    });
+
+    scrollBtn.addEventListener('click', function() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+}
+
+function setupSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({behavior: 'smooth'});
+            }
+        });
+    });
+}
+
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.main-nav a');
+    window.addEventListener('scroll', highlightActiveSection);
+}
+
+function highlightActiveSection() {
+    const navLinks = document.querySelectorAll('.main-nav a');
+    let current = '';
+
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 200) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').slice(1) === current) {
+            link.classList.add('active');
+        }
+    });
+}
+
+document.querySelectorAll('pre').forEach(pre => {
+    const button = document.createElement('button');
+    button.textContent = '📋 Copiar';
+    button.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #2a5298;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    `;
+
+    pre.style.position = 'relative';
+    pre.appendChild(button);
+
+    pre.addEventListener('mouseenter', () => {
+        button.style.opacity = '1';
+    });
+
+    pre.addEventListener('mouseleave', () => {
+        button.style.opacity = '0';
+    });
+
+    button.addEventListener('click', () => {
+        const codeEl = pre.querySelector('code');
+        const text = codeEl ? codeEl.textContent : pre.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            button.textContent = '✅ Copiado!';
+            setTimeout(() => {
+                button.textContent = '📋 Copiar';
+            }, 2000);
+        });
+    });
+});
+    </script>
+</body>
+</html>
