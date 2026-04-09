@@ -9,3 +9,10 @@ alembic==1.18.4
 streamlit==1.55.0
 plotly==6.6.0
 numpy==2.4.3
+# ── Nuevas dependencias para análisis estadístico ──
+jupyter==1.1.1
+notebook==7.5.5
+scikit-learn==1.8.0
+statsmodels==0.14.6
+scipy==1.17.1
+seaborn==0.13.2

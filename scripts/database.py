@@ -10,25 +10,34 @@ load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
-# Lee credenciales: primero intenta st.secrets (Streamlit Cloud),
+# Lee credenciales: primero intenta st.secrets (solo en Streamlit Cloud),
 # si no está disponible usa variables de entorno (.env local)
-def _get_db_config():
-    # Intento 1: st.secrets (disponible en Streamlit Cloud y en local con secrets.toml)
+def _is_running_in_streamlit():
+    """Detecta si estamos dentro de un proceso Streamlit real."""
     try:
-        import streamlit as st
-        host = st.secrets.get("DB_HOST", "")
-        if host and host != "localhost":
-            return {
-                "host":     host,
-                "port":     st.secrets.get("DB_PORT", "5432"),
-                "user":     st.secrets.get("DB_USER", "postgres"),
-                "password": st.secrets.get("DB_PASSWORD", ""),
-                "dbname":   st.secrets.get("DB_NAME", "postgres"),
-            }
+        from streamlit.runtime import get_instance
+        return get_instance() is not None
     except Exception:
-        pass  # st no disponible (ej: scripts de CLI), continúa
+        return False
 
-    # Intento 2: variables de entorno / .env (desarrollo local)
+def _get_db_config():
+    # Intento 1: st.secrets (solo cuando realmente corre dentro de Streamlit)
+    if _is_running_in_streamlit():
+        try:
+            import streamlit as st
+            host = st.secrets.get("DB_HOST", "")
+            if host:
+                return {
+                    "host":     host,
+                    "port":     st.secrets.get("DB_PORT", "5432"),
+                    "user":     st.secrets.get("DB_USER", "postgres"),
+                    "password": st.secrets.get("DB_PASSWORD", ""),
+                    "dbname":   st.secrets.get("DB_NAME", "postgres"),
+                }
+        except Exception:
+            pass
+
+    # Intento 2: variables de entorno / .env (desarrollo local y scripts CLI)
     host = os.getenv("DB_HOST", "localhost")
     return {
         "host":     host,
@@ -46,15 +55,16 @@ DB_PASSWORD = _cfg["password"]
 DB_NAME     = _cfg["dbname"]
 
 # URL de conexión — quote_plus codifica caracteres especiales en la contraseña (@, #, etc.)
-# sslmode=require es obligatorio para Supabase; se omite silenciosamente en local
+# sslmode=require solo para hosts remotos (Supabase); prefer para localhost
+_sslmode = "require" if DB_HOST not in ("localhost", "127.0.0.1") else "prefer"
 DATABASE_URL = (
     f"postgresql://{quote_plus(DB_USER)}:{quote_plus(DB_PASSWORD)}"
-    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require"
+    f"@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode={_sslmode}"
 )
 
 # Fuerza IPv4 para evitar problemas de conectividad IPv6 en WSL
 _connect_args = {"options": "-c timezone=UTC"}
-if DB_HOST != "localhost":
+if DB_HOST not in ("localhost", "127.0.0.1"):
     _connect_args["host"] = DB_HOST  # psycopg2 resuelve IPv4 primero
 
 # Motor SQLAlchemy
